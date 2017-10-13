@@ -9,13 +9,17 @@ typedef struct {
   int **mapa;
 } tmapa;
 
+typedef struct {
+
+} gmapa;
+
 void gera_mapa(tmapa *m, int semente) {
   int i, j;
 
   if(semente < 0)
-    srand(time(NULL));  
+    srand(time(NULL));
   else
-    srand(semente);  
+    srand(semente);
   m->mapa = (int**) malloc(m->nlinhas * sizeof(int*));
   for(i = 0; i < m->nlinhas; i++) {
     m->mapa[i] = (int*) malloc(m->ncolunas * sizeof(int));
@@ -94,86 +98,7 @@ void pinta_mapa(tmapa *m, int cor) {
   pinta(m, 0, 0, m->mapa[0][0], cor);
 }
 
-int pontos_solos(int *v, tmapa *m){
-  int i,j;
-  int solos = 0;
-  v = (int*) malloc(sizeof(int)*2);
-  int size = 2;
-  int aux;
-  //Esquerda cima
-  if (m->mapa[0][0] != m->mapa[0][1] &&
-      m->mapa[0][0] != m->mapa[1][0] &&
-      m->mapa[0][0] != m->mapa[1][1])
-  {
-    solo++;
-    if (size == solo*2)
-    {
-      aux = solo*2 - 2;
-      v[aux] = 0;
-      v[aux+1] = 0;
-    }
-  }
-  //Direita cima
-  if (m->mapa[0][m->ncolunas - 1] != m->mapa[0][m->ncolunas - 2] &&
-      m->mapa[0][m->ncolunas - 1] != m->mapa[1][m->ncolunas - 1] &&
-      m->mapa[0][m->ncolunas - 1] != m->mapa[1][m->ncolunas - 2])
-  {
-    solo++;
-    if (size == solo*2)
-    {
-      aux = solo*2 - 2;
-      v[aux] = 0;
-      v[aux+1] = m->ncolunas - 1;
-    }
-  }
-  //Esquerda baixo
-  if (m->mapa[m->nlinhas - 1][0] != m->mapa[m->nlinhas - 1][1] &&
-      m->mapa[m->nlinhas - 1][0] != m->mapa[m->nlinhas - 2][0] &&
-      m->mapa[m->nlinhas - 1][0] != m->mapa[m->nlinhas - 2][1])
-  {
-    solo++;
-    if (size == solo*2)
-    {
-      aux = solo*2 - 2;
-      v[aux] = m->nlinhas - 1;
-      v[aux+1] = 0;
-    }
-  }
-  //Direita Baixo
-  if (m->mapa[m->nlinhas - 1][m->ncolunas - 1] != m->mapa[m->nlinhas - 1][m->ncolunas - 2] &&
-      m->mapa[m->nlinhas - 1][m->ncolunas - 1] != m->mapa[m->nlinhas - 2][m->ncolunas - 1] &&
-      m->mapa[m->nlinhas - 1][m->ncolunas - 1] != m->mapa[m->nlinhas - 2][m->ncolunas - 2])
-  {
-    solo++;
-    if (size == solo*2)
-    {
-      aux = solo*2 - 2;
-      v[aux] = m->nlinhas - 1;
-      v[aux+1] = m->ncolunas - 1;
-    }
-  }
 
-  for (int j = 0; j < ncolunas; ++j)
-  {
-    /* code */
-  }
-  for (i = 0; i < m->nlinhas; ++i)
-  {
-    for (j = 0; j < m->ncolunas; ++j)
-    {
-      
-    }
-  }
-}
-
-void busca_solo(tmapa *m){
-  //achar os pontos solos.
-  int *v;
-  int n = pontos_solos(v, m);
-  //achar o menor caminho para cada ponto solo
-  //pegar o maior e usar como caminho.
-
-}
 
 int main(int argc, char **argv) {
   int cor;
@@ -194,7 +119,7 @@ int main(int argc, char **argv) {
   else
     semente = -1;
   gera_mapa(&m, semente);
-  mostra_mapa_cor(&m); 
+  mostra_mapa_cor(&m);
 
   scanf("%d", &cor);
   while(cor > 0 && cor <= m.ncores) {
