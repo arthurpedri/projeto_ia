@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <graphviz/cgraph.h>
 #include "grafo.h"
 
 struct vertice
@@ -15,6 +14,9 @@ struct vertice
 
 struct grafo
 {
+	int nl;
+	int nc;
+	int cores;
 	lista vertices;
 };
 
@@ -45,6 +47,16 @@ static vertice busca_vertice(lista l, vertice v){
 	for (no n_lista = primeiro_no(l); n_lista; n_lista=proximo_no(n_lista)) {
 	 	novo =  conteudo(n_lista);
 		if (v->l == novo->l && v->c == novo->c)
+			return novo;
+	 }
+	 return NULL;
+}
+
+static vertice busca_vertice_mapa(lista l, int l, int c){
+	vertice novo;
+	for (no n_lista = primeiro_no(l); n_lista; n_lista=proximo_no(n_lista)) {
+	 	novo =  conteudo(n_lista);
+		if (l == novo->l && c == novo->c)
 			return novo;
 	 }
 	 return NULL;
@@ -91,63 +103,112 @@ static int adiciona_vizinhanca (vertice In, vertice Out, grafo g){
 //
 // devolve o grafo lido ou
 //         NULL em caso de erro
-grafo le_grafo(FILE *input){
+grafo le_grafo(tmapa *m){
 
-	Agraph_t *grafo_entrada = agread(input, NULL);
-	if (!grafo_entrada)
+	if (!m)
 		return NULL;
 
 	grafo g = malloc(sizeof(struct grafo));
 	if (!g)
 		return NULL;
 
-	if (agisdirected(grafo_entrada)) {
-		g->direcionado = 1;
-	} else {
-		g->direcionado = 0;
-	}
-
-	g->nome = (char*) malloc(sizeof(char)*strlen(agnameof(grafo_entrada))+1);
-	strcpy(g->nome, agnameof(grafo_entrada));
-
-	if(agget(agfstedge(grafo_entrada, agfstnode(grafo_entrada)), "peso") != NULL)
-		g->ponderado = 1;
-	else
-		g->ponderado = 0;
-
+	g->nc = m->ncolunas;
+	g->nl = m->nlinhas;
+	g->cores = m->ncores;
 	g->vertices = constroi_lista();
-	g->arestas = constroi_lista();
 	vertice v;
 
-	// Percorre todos os vértices do grafo da estrutura cgraph, e gera um vértice igual na nossa estrutura
-	for (Agnode_t *v_entrada = agfstnode(grafo_entrada); v_entrada; v_entrada = agnxtnode(grafo_entrada,v_entrada)) {
-		v = constroi_vertice();
-		v->nome = (char*) malloc(sizeof(char)*strlen(agnameof(v_entrada))+1);
-		strcpy(v->nome, agnameof(v_entrada));
-		insere_lista (v, g->vertices);
-	}
-
-
-	Agnode_t *n;
-	Agnode_t *n_temp;
-	Agedge_t *e;
-
-	// Percorre cada vértice do grafo da estrutura cgraph, e para cada vértice
-	// acessamos suas arestas, e assim geramos uma aresta igual.
-	for (n = agfstnode(grafo_entrada); n; n = agnxtnode(grafo_entrada,n)) {
-		for (e = agfstout(grafo_entrada,n); e; e = agnxtout(grafo_entrada,e)) {
-			aresta a = constroi_aresta();
-			n_temp = n;
-			a->verticeIn = busca_vertice_cgraph(g, n_temp);
-			n_temp = aghead(e);
-			a->verticeOut = busca_vertice_cgraph(g, n_temp);
-
-			adiciona_vizinhanca (a->verticeIn, a->verticeOut, g);
-			insere_lista (a, g->arestas);
-			if (g->ponderado)
-				a->peso = (long int) atoi (agget(e, "peso"));
+	// Percorre todas as posições da matriz para criar todos os vértices
+	for (int i = 0; i < g->nl; i++;) {
+		for (int j = 0; j < g->nc; j++) {
+			v = constroi_vertice();
+			v->l = i;
+			v->c = j;
+			v->cor = m->mapa[i][j];
+			insere_lista (v, g->vertices);
 		}
 	}
+
+	vertice aux;
+	// Gera a lista de adijacência para cada vértice, percorrendo a matriz
+
+	//Cantos
+	v = busca_vertice_mapa(g->vertices, 0, 0);
+	aux = busca_vertice_mapa(g->vertices, 0, 1);
+	insere_lista(aux, v->vizinhos);
+	aux = busca_vertice_mapa(g->vertices, 1, 0);
+	insere_lista(aux, v->vizinhos);
+
+	v = busca_vertice_mapa(g->vertices, 0, g->nc - 1);
+	aux = busca_vertice_mapa(g->vertices, 0, g->nc - 2);
+	insere_lista(aux, v->vizinhos);
+	aux = busca_vertice_mapa(g->vertices, 1, g->nc - 1);
+	insere_lista(aux, v->vizinhos);
+
+	v = busca_vertice_mapa(g->vertices, g->nl-1, 0);
+	aux = busca_vertice_mapa(g->vertices, g->nl - 1, 1);
+	insere_lista(aux, v->vizinhos);
+	aux = busca_vertice_mapa(g->vertices, g->nl - 2, 0);
+	insere_lista(aux, v->vizinhos);
+
+	v = busca_vertice_mapa(g->vertices, g->nl - 1, g->nc - 1);
+	aux = busca_vertice_mapa(g->vertices, g->nl - 2, g->nc - 1);
+	insere_lista(aux, v->vizinhos);
+	aux = busca_vertice_mapa(g->vertices, g->nl - 1, g->nc - 2);
+	insere_lista(aux, v->vizinhos);
+
+	//Linhas horizontais, sem as posições do canto
+	for (int j = 1; j < g->nc - 1; j++) {
+		v = busca_vertice_mapa(g->vertices, 0, j);
+		aux = busca_vertice_mapa(g->vertices, 0, j-1);
+		insere_lista(aux, v->vizinhos);
+		aux = busca_vertice_mapa(g->vertices, 0, j+1);
+		insere_lista(aux, v->vizinhos);
+		aux = busca_vertice_mapa(g->vertices, 1, j);
+		insere_lista(aux, v->vizinhos);
+
+		v = busca_vertice_mapa(g->vertices, g->nl - 1, j);
+		aux = busca_vertice_mapa(g->vertices, g->nl - 1, j-1);
+		insere_lista(aux, v->vizinhos);
+		aux = busca_vertice_mapa(g->vertices, g->nl - 1, j+1);
+		insere_lista(aux, v->vizinhos);
+		aux = busca_vertice_mapa(g->vertices, g->nl - 2, j);
+		insere_lista(aux, v->vizinhos);
+	}
+	//Linhas verticais, sem as posições do canto
+	for (int i = 1; i < g->nl - 1; i++) {
+		v = busca_vertice_mapa(g->vertices, i, 0);
+		aux = busca_vertice_mapa(g->vertices, i-1, 0);
+		insere_lista(aux, v->vizinhos);
+		aux = busca_vertice_mapa(g->vertices, i, 1);
+		insere_lista(aux, v->vizinhos);
+		aux = busca_vertice_mapa(g->vertices, i+1, 0);
+		insere_lista(aux, v->vizinhos);
+
+		v = busca_vertice_mapa(g->vertices, i, g->nc - 1);
+		aux = busca_vertice_mapa(g->vertices, i-1, g->nc - 1);
+		insere_lista(aux, v->vizinhos);
+		aux = busca_vertice_mapa(g->vertices, i, g->nc - 2);
+		insere_lista(aux, v->vizinhos);
+		aux = busca_vertice_mapa(g->vertices, i+1, g->nc - 1);
+		insere_lista(aux, v->vizinhos);
+	}
+	// Percorre o miolo (1 1 até nl-1 nc-1)
+	for (int i = 1; i < g->l - 1; i++) {
+		for (int j = 1; j < g->c - 1; i++) {
+			v = busca_vertice_mapa(g->vertices, i, j);
+
+			aux = busca_vertice_mapa(g->vertices, i-1, j);
+			insere_lista(aux, v->vizinhos);
+			aux = busca_vertice_mapa(g->vertices, i, j+1);
+			insere_lista(aux, v->vizinhos);
+			aux = busca_vertice_mapa(g->vertices, i+1, j);
+			insere_lista(aux, v->vizinhos);
+			aux = busca_vertice_mapa(g->vertices, i, j-1);
+			insere_lista(aux, v->vizinhos);
+		}
+	}
+
 	return g;
 
 }
@@ -204,6 +265,10 @@ grafo copia_grafo(grafo g){
 	for (v_entrada = primeiro_no(g->vertices); v_entrada; v_entrada = proximo_no(v_entrada)) {
 		v = constroi_vertice();
 		temp_v = conteudo(v_entrada);
+		v->visitado = temp_v->visitado;
+		v->l = temp_v->l;
+		v->c = temp_v->c;
+		v->indice = temp_v->indice;
 		insere_lista (v, g_copy->vertices);
 	}
 	no vizinho;
@@ -212,16 +277,11 @@ grafo copia_grafo(grafo g){
 	// Após já ter todos os vértices copiados, gera a lista de vizinhos
 	for (v_entrada = primeiro_no(g->vertices); v_entrada; v_entrada = proximo_no(v_entrada)) {
 		temp_v = conteudo(v_entrada);
-		v = busca_vertice(g_copy->vertices, temp_v); // 'v' é o Vertice equivalente no g_copy
-		for (vizinho = primeiro_no(temp_v->vizinhosIn); vizinho; vizinho = proximo_no(vizinho)) {
+		v = busca_vertice_mapa(g_copy->vertices, temp_v->l, temp_v->c); // 'v' é o Vertice equivalente no g_copy
+		for (vizinho = primeiro_no(temp_v->vizinhos); vizinho; vizinho = proximo_no(vizinho)) {
 			temp_v2 = conteudo(vizinho);
-			v2 = busca_vertice(g_copy->vertices, temp_v2);
-			insere_lista(v2, v->vizinhosIn);
-		}
-		for (vizinho = primeiro_no(temp_v->vizinhosOut); vizinho; vizinho = proximo_no(vizinho)) {
-			temp_v2 = conteudo(vizinho);
-			v2 = busca_vertice(g_copy->vertices, temp_v2);
-			insere_lista(v2, v->vizinhosOut);
+			v2 = busca_vertice(g_copy->vertices, temp_v2->l, temp_v2->c);
+			insere_lista(v2, v->vizinhos);
 		}
 	}
 	return g_copy;
@@ -254,7 +314,7 @@ unsigned int grau(vertice v, grafo g)
 // // se todo vértice em C é vizinho de todos os outros vértices de C em g
 int clique(lista l, grafo g) {
 	unsigned int tam = tamanho_lista(l);
-	if (tamanho_lista == 0) //Se vizinhanca eh vazia, eh clique
+	if (tam == 0) //Se vizinhanca eh vazia, eh clique
 		return 1;
 
 	vertice v;
