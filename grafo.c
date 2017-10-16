@@ -9,6 +9,7 @@ struct vertice
 	int l;
 	int c;
 	int cor;
+	int indice;
 	lista vizinhos;
 };
 
@@ -210,6 +211,65 @@ grafo le_grafo(tmapa *m){
 	}
 
 	return g;
+
+}
+
+//h(n);
+int h (grafo g, int *passo){
+	no aux = primeiro_no(g->vertices);
+	vertice raiz = conteudo(aux);
+	if (raiz->l != 0 && raiz->c != 0)
+	{
+		printf("Erro no acesso à raiz;\n");
+		return -1;
+	}
+	// tem que fazer busca em largura para setar os indices
+	//assume que os indices estão na lista indices;
+	lista indices;
+	set_visitados(g->vertices, 0);
+
+	vertice v_aux;
+	int ind_cont = 1;
+	raiz->indice = ind_cont;
+	for (aux = primeiro_no(v->vizinhos); aux; aux = proximo_no(v->vizinho)) {
+		v_aux = conteudo(aux);
+		// for() setar o indice dos filhos
+		//for() busca_largura() // que acabei de pensar que não é busa em largura
+		// é apenas uma busca em profundidade que seta todos os seus filhos antes
+		
+
+	}
+
+	int passo_local;
+	int menor_local = 0;
+	int *menor;
+	menor = malloc(sizeof(int));
+	int menor_aux;
+	int passo_aux;
+
+	int maior_ind_local = 0;
+	no aux_i;
+	aux = primeiro_no(g->vertices);
+	for(aux_i = primeiro_no(indices); aux_i; aux_i = proximo_no(indices)){
+		int indice = conteudo(aux_i);
+		for (aux = primeiro_no(v->vizinhos); aux; aux = proximo_no(v->vizinho)) {
+			v_aux = conteudo(aux);
+			passo_aux = busca_profundidade(v_aux, indice, raiz, 0, menor, 0);//vertice, indice, raiz(pai), *menor, cont)
+			if (*menor < menor_local)
+			{
+				menor_local = *menor;
+				passo_local = passo_aux;
+			}
+		}
+		if (maior_ind_local < menor_local)
+		{
+			maior_ind_local = menor_local;
+			*passo = passo_local;
+		}
+	}
+	// no final desse for *passo será o passo a ser executado
+	//e o maior_ind_local o menor caminho para o indice(grupo) mais longe;
+	return maior_ind_local;
 
 }
 
