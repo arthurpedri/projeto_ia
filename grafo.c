@@ -223,20 +223,38 @@ int h (grafo g, int *passo){
 		printf("Erro no acesso à raiz;\n");
 		return -1;
 	}
-	// tem que fazer busca em largura para setar os indices
-	//assume que os indices estão na lista indices;
-	lista indices;
+	// geração dos indices
 	set_visitados(g->vertices, 0);
 
 	vertice v_aux;
-	int ind_cont = 1;
-	raiz->indice = ind_cont;
-	for (aux = primeiro_no(v->vizinhos); aux; aux = proximo_no(v->vizinho)) {
+	int ind_cont = 2;
+	raiz->indice = 1;
+	// for() setar o indice dos filhos
+	for (aux = primeiro_no(raiz->vizinhos); aux; aux = proximo_no(raiz->vizinhos)) {
 		v_aux = conteudo(aux);
-		// for() setar o indice dos filhos
-		//for() busca_largura() // que acabei de pensar que não é busa em largura
-		// é apenas uma busca em profundidade que seta todos os seus filhos antes
-		
+		if (v_aux->cor == raiz->cor) {
+			v_aux->indice = raix->indice;
+		}
+		else{
+			v_aux->indice = ind_cont;
+			ind_cont++;
+		}
+		v_aux->visitado = 1;
+	}
+	//for() busca_largura() // que acabei de pensar que não é busa em largura
+	for (aux = primeiro_no(raiz->vizinhos); aux; aux = proximo_no(raiz->vizinhos)) {
+		v_aux = conteudo(aux);
+		gera_indice(v_aux, ind_cont, raiz);
+	}
+	// criar lista de indice;
+	int *ind_aux;
+	lista indices;
+	for(aux = primeiro_no(g->vertices); aux; aux = proximo_no(g->vertices){
+		v_aux = conteudo(aux);
+		if (!existe_indice(indices, v_aux->indice)) {
+			ind_aux = malloc(sizeof(int));
+			insere_lista(ind_aux, indices);
+		}
 
 	}
 
@@ -249,10 +267,10 @@ int h (grafo g, int *passo){
 
 	int maior_ind_local = 0;
 	no aux_i;
-	aux = primeiro_no(g->vertices);
+	int *indice;
 	for(aux_i = primeiro_no(indices); aux_i; aux_i = proximo_no(indices)){
-		int indice = conteudo(aux_i);
-		for (aux = primeiro_no(v->vizinhos); aux; aux = proximo_no(v->vizinho)) {
+		indice = conteudo(aux_i);
+		for (aux = primeiro_no(g->vertices); aux; aux = proximo_no(g->vertices)) {
 			v_aux = conteudo(aux);
 			passo_aux = busca_profundidade(v_aux, indice, raiz, 0, menor, 0);//vertice, indice, raiz(pai), *menor, cont)
 			if (*menor < menor_local)
