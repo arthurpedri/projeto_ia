@@ -17,6 +17,7 @@ struct lista {
   unsigned int tamanho;
   int padding; // só pra evitar warning
   no primeiro;
+  no ultimo;
 };
 //---------------------------------------------------------------------------
 // devolve o número de nós da lista l
@@ -54,6 +55,7 @@ lista constroi_lista(void) {
     return NULL;
 
   l->primeiro = NULL;
+  l->ultimo = NULL;
   l->tamanho = 0;
 
   return l;
@@ -101,12 +103,17 @@ no insere_lista(void *conteudo, lista l) {
 
   if ( ! novo )
     return NULL;
-
+  if (!tamanho_lista(l)){
+    l->primeiro = novo;
+    l->ultimo = novo;
+  }
   novo->conteudo = conteudo;
-  novo->proximo = primeiro_no(l);
+  novo->proximo = NULL;
   ++l->tamanho;
-
-  return l->primeiro = novo;
+  l->ultimo->proximo = novo;
+  l->ultimo = novo;
+  
+  return novo;
 }
 
 //------------------------------------------------------------------------------
