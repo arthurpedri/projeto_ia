@@ -146,3 +146,20 @@ int remove_no(struct lista *l, struct no *rno, int destroi(void *)) {
 	}
 	return 0;
 }
+
+int tira_no(struct lista *l, struct no *rno) {
+	int r = 1;
+	if (l->primeiro == rno) {
+		l->primeiro = rno->proximo;
+		l->tamanho--;
+		return r;
+	}
+	for (no n = primeiro_no(l); n->proximo; n = proximo_no(n)) {
+		if (n->proximo == rno) {
+			n->proximo = rno->proximo;
+			l->tamanho--;
+			return r;
+		}
+	}
+	return 0;
+}

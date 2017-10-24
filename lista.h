@@ -67,4 +67,6 @@ int destroi_lista(lista l, int destroi(void *));
 //         0, se rno não for um no de l
 
 int remove_no(struct lista *l, struct no *rno, int destroi(void *));
+
+int tira_no(struct lista *l, struct no *rno);
 #endif

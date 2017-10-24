@@ -14,6 +14,12 @@ struct vertice
 	lista vizinhos;
 };
 
+struct nobusca
+{
+	int peso;
+	nobusca pai;
+};
+
 struct grafo
 {
 	int nl;
@@ -42,6 +48,15 @@ static vertice constroi_vertice(void) {
 	return v;
 }
 
+static nobusca constroi_nobusca(void) {
+	nobusca v = malloc(sizeof(struct nobusca));
+	if (!v)
+		return NULL;
+	v->peso = 0;
+	v->pai = NULL;
+	return v;
+}
+
 
 //------------------------------------------------------------------------------
 // Busca um vertice v na lista dada
@@ -50,6 +65,16 @@ static vertice busca_vertice(lista l, vertice v){
 	for (no n_lista = primeiro_no(l); n_lista; n_lista=proximo_no(n_lista)) {
 	 	novo =  conteudo(n_lista);
 		if (v->l == novo->l && v->c == novo->c)
+			return novo;
+	 }
+	 return NULL;
+}
+
+static vertice busca_indice(lista l, vertice v){
+	vertice novo;
+	for (no n_lista = primeiro_no(l); n_lista; n_lista=proximo_no(n_lista)) {
+	 	novo =  conteudo(n_lista);
+		if (v->indice == novo->indice)
 			return novo;
 	 }
 	 return NULL;
@@ -72,6 +97,18 @@ static int existe_vertice(lista l, vertice v){
 	for (no n_lista = primeiro_no(l); n_lista; n_lista=proximo_no(n_lista)) {
 	 	novo =  conteudo(n_lista);
 		if (v->l == novo->l && v->c == novo->c)
+			return 1;
+	 }
+	 return 0;
+}
+
+//------------------------------------------------------------------------------
+// Verifica se indice? esta na lista l
+static int existe_vertice_indice(lista l, vertice v){
+	vertice novo;
+	for (no n_lista = primeiro_no(l); n_lista; n_lista=proximo_no(n_lista)) {
+	 	novo =  conteudo(n_lista);
+		if (v->indice == novo->indice)
 			return 1;
 	 }
 	 return 0;
@@ -375,60 +412,90 @@ int h (grafo g, int *passo){
 	
 	// criar lista de indice;
 	int *ind_aux;
-	lista indices;
+	int tanalista;
+	lista indices = constroi_lista();
+	lista componentes = constroi_lista();
+	vertice componente, v_aux2, v_aux3, v_aux4;
+	no aux2, aux3;
+	
 	for(aux = primeiro_no(g->vertices); aux; aux = proximo_no(g->vertices){
 		v_aux = conteudo(aux);
 		if (!existe_indice(indices, v_aux->indice)) { // se nao existe o indice na lista ele adiciona (so precisa de 1 representante do indice na lista)
 			ind_aux = malloc(sizeof(int));
+			v_aux2 = constroi_vertice();
 			*ind_aux = v_aux->indice;
 			insere_lista(ind_aux, indices);
-		}
-
-	}
-
-	int passo_local; 
-	int menor_local = 0;
-	int *menor; // menor caminho encontrado
-	menor = malloc(sizeof(int));
-	*menor = 0;
-	int menor_aux;
-	int passo_aux;
-
-	set_parametro(g->vertices, 0, 0); // reseta todos os vertices para nao visitados
-
-	int maior_ind_local = 0;
-	no aux_i;
-	int *indice;
-	
-	raiz->visitado = 0;
-	
-	for(aux_i = primeiro_no(indices); aux_i; aux_i = proximo_no(indices)){ // percorre a lista de indices
-		indice = conteudo(aux_i); // numero do indice a ser buscado
-		if (raiz->indice != *indice){
-			for (aux = primeiro_no(raiz->vizinhos); aux; aux = proximo_no(raiz->vizinhos)) {
-				v_aux = conteudo(aux);
-				if (v_aux->cor == raiz->cor){
-					passo_aux = busca_profundidade(v_aux, *indice, menor, 0, raiz->indice);// (vertice, indice, *menor, cont)     começa com o passo = 0 porque o filho tem a mesma cor
-				} else{
-					passo_aux = busca_profundidade(v_aux, *indice, menor, 1, raiz->indice);// (vertice, indice, *menor, cont)     começa com o passo = 1 porque estamos olhando para o filho
+			for(aux2 = primeiro_no(g->vertices); aux2; aux2 = proximo_no(g->vertices){
+				v_aux2 = conteudo(aux2);
+				if(v_aux2->indice == v_aux->indice){
+					tanalista =  0 ;
+					if (tamanho_lista(componentes)){
+						for (aux3 = primeiro_no(componentes); aux3; aux3 = proximo_no(componentes)) {
+							v_aux3 = conteudo(aux3);
+							if (v_aux3->indice == v_aux2->indice){
+								tanalista = 1;
+								componente = v_aux3;
+								break;
+							}
+						}
+					}
+					if (!tanalista){ // v_aux3 != vertice do componente
+						componente = constroi_vertice();
+						componente->indice = v_aux2->indice;
+						componente->vizinhos = constroi_lista();
+						insere_lista(componente, componentes);
+					}
+					
+					for (aux3 = primeiro_no(v_aux2->vizinhos); aux3; aux3 = proximo_no(v_aux2->vizinhos)) {
+						v_aux3 = conteudo(aux3);
+						if (v_aux3->indice != v_aux2->indice){
+							v_aux4 = busca_indice(componentes, v_aux3); // retorna vertice equivalente ao indice do v_aux3 na lista de componentes
+							if (!v_aux4){
+								v_aux4 = constroi_vertice();
+								v_aux4->indice = v_aux3->indice;
+								v_aux4->vizinhos = constroi_lista();
+								insere_lista(v_aux4, componentes);
+							}
+							if(!existe_vertice_indice(v_aux4->vizinhos, componente))
+								insere_lista(componente, v_aux4->vizinhos);
+							if(!existe_vertice(componente->vizinhos, v_aux4))
+								insere_lista(v_aux4, componente->vizinhos);
+						}
+					}
 				}
-				if (*menor < menor_local || menor_local == 0)
-				{
-					menor_local = *menor;
-					passo_local = passo_aux;
-				}
-			}
-		 
-			if (maior_ind_local < menor_local || maior_ind_local == 0)
-			{
-				maior_ind_local = menor_local;
-				*passo = passo_local;
 			}
 		}
 	}
-	// no final desse for *passo será o passo a ser executado
-	//e o maior_ind_local o menor caminho para o indice(grupo) mais longe;
-	return maior_ind_local;
+
+	// fila de prioridades <- raiz (lista componentes) verificar se o primeiro elemento da lista é realmente a raiz
+	aux = primeiro_no(componentes);
+	v_aux = conteudo(aux);
+	if(!v_aux->indice == raiz->indice){
+		printf("Raiz dos componentes diferente da raiz do grafo;\n");
+		return -1;
+	}
+	v_aux->visitado = 1;
+	
+	nobusca nob;
+	lista prioridades = constroi_lista();
+	insere_lista(aux, prioridades);
+	
+	while (tamanho_lista(prioridades)){
+		aux = primeiro_no(prioridades);
+		v_aux = conteudo(aux);
+		tira_no(prioridades, aux);
+		for (aux2 = primeiro_no(v_aux->vizinhos); aux2; aux2 = proximo_no(v_aux->vizinhos)) {
+			v_aux2 = conteudo(aux2);
+			v_aux2->visitado = 1;
+		}	
+	}
+
+
+
+
+
+
+
 
 }
 

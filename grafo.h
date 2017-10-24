@@ -19,6 +19,8 @@
 
 typedef struct grafo *grafo;
 
+typedef struct nobusca *nobusca;
+
 //------------------------------------------------------------------------------
 // devolve o nome do grafo g
 
