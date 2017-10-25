@@ -100,9 +100,9 @@ static int busca_indice_cor(lista l, int indice){
 	 return -1;
 }
 
-static vertice busca_vertice_mapa(lista l, int l, int c){
+static vertice busca_vertice_mapa(lista li, int l, int c){
 	vertice novo;
-	for (no n_lista = primeiro_no(l); n_lista; n_lista=proximo_no(n_lista)) {
+	for (no n_lista = primeiro_no(li); n_lista; n_lista=proximo_no(n_lista)) {
 	 	novo =  conteudo(n_lista);
 		if (l == novo->l && c == novo->c)
 			return novo;
@@ -329,51 +329,7 @@ void gera_indice(vertice v, int *ind_cont, vertice pai){
 	}
 }
 
-int busca_profundidade(vertice v, int indice, int *menor, int cont, int indiceraiz){ // (vertice, indice, *menor, cont, indiceraiz)   começa com o passo = 1 porque estamos olhando para o filho
-	int passo_local = -1;
-	int menor_local = 0;
-	int menor_aux;
-	int passo_aux = -1;
 
-	int maior_ind_local = 0;
-	no aux;
-	vertice v_aux;
-
-	v->visitado = 1;
-
-	if (v->indice == indice){
-		*menor = cont;
-		return v->cor;
-	}
-
-	if (cont > *menor)
-		return -1;
-
-
-	for (aux = primeiro_no(v->vizinhos); aux; aux = proximo_no(v->vizinhos)) {
-		v_aux = conteudo(aux);
-		if (v_aux->visitado){
-			if (v_aux->cor == v->cor){
-				passo_aux = busca_profundidade(v_aux, indice, raiz, menor, cont, indiceraiz);// (vertice, indice, *menor, cont, indiceraiz)     começa com o passo = 0 porque o filho tem a mesma cor
-			} else{
-				passo_aux = busca_profundidade(v_aux, indice, raiz, menor, cont + 1, indiceraiz);// (vertice, indice, *menor, cont, indiceraiz)     começa com o passo = 1 porque estamos olhando para o filho
-			}
-			if (passo_aux >= 0){
-				if (indiceraiz == v->indice){
-					passo_local = passo_aux;
-				}
-				else {
-					passo_local = v->cor;
-				}
-			}
-		}
-	}
-
-	return passo_local;
-
-
-
-}
 void busca_comunidade(vertice v){
 	vertice filho;
 	no aux;
@@ -740,15 +696,6 @@ int destroi_grafo(void *g) {
 // //------------------------------------------------------------------------------
 // // devolve um grafo igual a g
 
-int visitado;
-	int l;
-	int c;
-	int cor;
-	int indice;
-	int comunidade;
-	int peso;
-	lista vizinhos;
-	
 grafo copia_grafo(grafo g){
 	grafo g_copy = malloc(sizeof(struct grafo));
 	vertice v;

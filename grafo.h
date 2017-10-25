@@ -3,6 +3,7 @@
 
 #include <stdlib.h>
 #include "lista.h"
+#include "mapa.h"
 
 //------------------------------------------------------------------------------
 // (apontador para) estrutura de dados para representar um grafo
@@ -20,6 +21,35 @@
 typedef struct grafo *grafo;
 
 typedef struct nobusca *nobusca;
+
+//------------------------------------------------------------------------------
+// (apontador para) estrutura de dados que representa um vértice do grafo
+//
+// cada vértice tem um nome que é uma "string"
+
+typedef struct vertice *vertice;
+
+void set_parametro(lista l, int parametro, int valor);
+
+void gera_indice(vertice v, int *ind_cont, vertice pai);
+
+void busca_comunidade(vertice v);
+
+int existe_indice(lista l, int indice);
+
+lista cria_componentes(grafo g);
+
+int h (lista componentes);
+
+lista A_estrela (tmapa *m);
+
+void joga (int cor, int indice, grafo g);
+
+no menorfn (lista l);
+
+void copia_lista_cor(lista origem, lista destino);
+
+
 
 //------------------------------------------------------------------------------
 // devolve o nome do grafo g
@@ -48,12 +78,7 @@ unsigned int n_vertices(grafo g);
 
 unsigned int n_arestas(grafo g);
 
-//------------------------------------------------------------------------------
-// (apontador para) estrutura de dados que representa um vértice do grafo
-//
-// cada vértice tem um nome que é uma "string"
 
-typedef struct vertice *vertice;
 
 //------------------------------------------------------------------------------
 // devolve o nome do vertice v
@@ -77,7 +102,7 @@ char *nome_vertice(vertice v);
 // devolve o grafo lido ou
 //         NULL em caso de erro
 
-grafo le_grafo(FILE *input);
+grafo le_grafo(tmapa *m);
 
 //------------------------------------------------------------------------------
 // desaloca toda a memória usada em *g
@@ -119,7 +144,7 @@ grafo copia_grafo(grafo g);
 //
 // se direcao == 1, v é um vértice de um grafo direcionado e a função
 //                  devolve sua vizinhanca de saída
-
+/*
 lista vizinhanca(vertice v, int direcao, grafo g);
 
 //------------------------------------------------------------------------------
@@ -173,4 +198,5 @@ int ordem_perfeita_eliminacao(lista l, grafo g);
 //         0, caso contrário
 
 int cordal(grafo g);
+*/
 #endif
