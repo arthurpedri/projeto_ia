@@ -106,12 +106,16 @@ no insere_lista(void *conteudo, lista l) {
   if (!tamanho_lista(l)){
     l->primeiro = novo;
     l->ultimo = novo;
+    novo->conteudo = conteudo;
+    novo->proximo = NULL;
+    ++l->tamanho;
+  } else {
+      novo->conteudo = conteudo;
+      novo->proximo = NULL;
+      l->ultimo->proximo = novo;
+      l->ultimo = novo;
+      ++l->tamanho;
   }
-  novo->conteudo = conteudo;
-  novo->proximo = NULL;
-  ++l->tamanho;
-  l->ultimo->proximo = novo;
-  l->ultimo = novo;
   
   return novo;
 }

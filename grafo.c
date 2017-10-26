@@ -114,7 +114,6 @@ static vertice busca_indice(lista l, vertice v){
 	vertice novo;
 	for (no n_lista = primeiro_no(l); n_lista; n_lista=proximo_no(n_lista)) {
 	 	novo =  conteudo(n_lista);
-	 	imprime_debug("busca");
 		if (v->indice == novo->indice)
 			return novo;
 	 }
@@ -580,7 +579,7 @@ lista cria_componentes(grafo g) {
 	destroi_lista(indices, NULL);
 
 	set_parametro(g->vertices, 0, 0); // reseta todos os vertices para nao visitados
-	
+	printf("comp %d\n", tamanho_lista(componentes));
 	return componentes;
 
 }
@@ -594,24 +593,32 @@ int h (lista componentes){
 		return 0;
 	}
 	
+	
 	// fila de prioridades <- raiz (lista componentes) verificar se o primeiro elemento da lista é realmente a raiz
 	aux = primeiro_no(componentes);
 	v_aux = conteudo(aux);
-
 	v_aux->visitado = 1;
 	v_aux->peso = 0;
 	lista prioridades = constroi_lista();
+
+	// for (aux; aux; proximo_no(aux)){
+	// 	v_aux2 = conteudo(aux);
+	// 	printf("i: %d, j: %d indice %d, tamanho %d\n", v_aux2->indice, tamanho_lista(componentes));
+	// }
 
 	for (aux2 = primeiro_no(v_aux->vizinhos); aux2; aux2 = proximo_no(aux2)) {
 		v_aux2 = conteudo(aux2);
 		v_aux2->visitado = 1;
 		v_aux2->peso = v_aux->peso +1;
 		insere_lista(aux2, prioridades);
+		printf("indice %d\n", v_aux2->indice);
 	}
 
 	while (tamanho_lista(prioridades)){
 		aux = primeiro_no(prioridades);
 		v_aux = conteudo(aux);
+		
+		imprime_debug("teste");
 		for (aux2 = primeiro_no(v_aux->vizinhos); aux2; aux2 = proximo_no(aux2)) {
 			v_aux2 = conteudo(aux2);
 			if (!v_aux2->visitado) {
@@ -642,7 +649,7 @@ lista A_estrela (tmapa *m){
 	lista passos;
 	int *passo;
 	grafo g = le_grafo(m);
-	imprime_grafo(g);
+	//imprime_grafo(g);
 	grafo g2;
 	
 	imprime_debug("cria componentes");
