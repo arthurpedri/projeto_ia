@@ -1,16 +1,22 @@
 CFLAGS  = -g -std=c99
 
-#------------------------------------------------------------------------------
-.PHONY : all clean
+all: lista mapa grafo princ outro
 
-#------------------------------------------------------------------------------
-all : main
+lista: 
+	gcc $(CFLAGS) -c lista.c -o lista.o
+
+mapa: 
+	gcc $(CFLAGS) -c mapa.c -o mapa.o
+
+grafo: 
+	gcc $(CFLAGS) -c grafo.c -o grafo.o
+
+princ:
+	gcc $(CFLAGS) -c main.c -o main.o 
+
+outro: 
+	gcc  main.o grafo.o mapa.o lista.o -o main
 
 
-	      
-main : lista.o mapa.o grafo.o main.o
-	$(CC) -g $(CFLAGS) -o $@ $^ -l cgraph
-
-#------------------------------------------------------------------------------
 clean :
-	$(RM) main *.o *.png
+	$(RM) main *.o 

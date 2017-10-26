@@ -22,6 +22,10 @@ typedef struct grafo *grafo;
 
 typedef struct nobusca *nobusca;
 
+void imprime_lista(lista l);
+
+void imprime_debug(char *c);
+
 //------------------------------------------------------------------------------
 // (apontador para) estrutura de dados que representa um vértice do grafo
 //
