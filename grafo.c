@@ -41,10 +41,10 @@ void imprime_grafo(grafo g){
 	vertice v, v2;
 	for(no n = primeiro_no(g->vertices); n; n = proximo_no(n)){
 		v = conteudo(n);
-		printf("%d - [%d,%d]\n", v->cor, v->l, v->c);
+		//printf("%d - [%d,%d] -> %d\n", v->cor, v->l, v->c, v->indice);
 		for(no n2 = primeiro_no(v->vizinhos); n2; n2 = proximo_no(n2)){
 			v2 = conteudo(n2);
-			printf("	%d - [%d,%d]\n", v2->cor, v2->l, v2->c);
+			//printf("	%d - [%d,%d]\n", v2->cor, v2->l, v2->c);
 		}
 		
 	}
@@ -52,11 +52,9 @@ void imprime_grafo(grafo g){
 
 void imprime_lista(lista l){
 	int *novo;
-	int contador = 0;
 	for (no n_lista = primeiro_no(l); n_lista; n_lista=proximo_no(n_lista)) {
 	 	novo = conteudo(n_lista);
-	 	contador++;
-		printf("%d cont: %d", *novo, contador);
+		printf("%d ", *novo);
 	}
 	printf("\n");
 	return;
@@ -270,7 +268,6 @@ grafo le_grafo(tmapa *m){
 	g->vertices = constroi_lista();
 	vertice v;
 
-	imprime_debug("cria vertices");
 	// Percorre todas as posições da matriz para criar todos os vértices
 	for (int i = 0; i < g->nl; i++) {
 		for (int j = 0; j < g->nc; j++) {
@@ -282,11 +279,9 @@ grafo le_grafo(tmapa *m){
 		}
 	}
 	
-	imprime_debug("fim cria vertices");
 
 	vertice aux;
 	// Gera a lista de adijacência para cada vértice, percorrendo a matriz
-	imprime_debug("cantos");
 	//Cantos
 	v = busca_vertice_mapa(g->vertices, 0, 0);
 	aux = busca_vertice_mapa(g->vertices, 0, 1);
@@ -312,9 +307,7 @@ grafo le_grafo(tmapa *m){
 	aux = busca_vertice_mapa(g->vertices, g->nl - 1, g->nc - 2);
 	insere_lista(aux, v->vizinhos);
 	
-	imprime_debug("fim cantos");
 
-	imprime_debug("linhas horizontais");
 	//Linhas horizontais, sem as posições do canto
 	for (int j = 1; j < g->nc - 1; j++) {
 		v = busca_vertice_mapa(g->vertices, 0, j);
@@ -334,9 +327,7 @@ grafo le_grafo(tmapa *m){
 		insere_lista(aux, v->vizinhos);
 	}
 	
-	imprime_debug("fim linhas horizontais");
 	
-	imprime_debug("linhas verticais");
 	//Linhas verticais, sem as posições do canto
 	for (int i = 1; i < g->nl - 1; i++) {
 		v = busca_vertice_mapa(g->vertices, i, 0);
@@ -356,9 +347,7 @@ grafo le_grafo(tmapa *m){
 		insere_lista(aux, v->vizinhos);
 	}
 	
-	imprime_debug("fim linhas verticais");
 	
-	imprime_debug("miolo");
 	// Percorre o miolo (1 1 até nl-2 nc-2)
 	for (int i = 1; i < g->nl - 1; i++) {
 		for (int j = 1; j < g->nc - 1; j++) {
@@ -373,10 +362,8 @@ grafo le_grafo(tmapa *m){
 			aux = busca_vertice_mapa(g->vertices, i, j-1);
 			insere_lista(aux, v->vizinhos);
 		}
-		imprime_debug("fim j");
 	}
 	
-	imprime_debug("fim miolo");
 
 	return g;
 
@@ -408,7 +395,6 @@ void gera_indice(vertice v, int *ind_cont, vertice pai){
 	vertice filho;
 	no aux;
 	if (v->comunidade == 1){
-		//printf("%d v\n", v->cor);
 		for (aux = primeiro_no(v->vizinhos); aux; aux = proximo_no(aux)) {
 			filho = conteudo(aux);
 			if (filho->visitado == 0){
@@ -420,11 +406,10 @@ void gera_indice(vertice v, int *ind_cont, vertice pai){
 	else {
 		v->comunidade = 1;
 		v->indice = *ind_cont;
-		*ind_cont++;
+		(*ind_cont)++;
 		for (aux = primeiro_no(v->vizinhos); aux; aux = proximo_no(aux)) {
 			filho = conteudo(aux);
 			if (filho->cor == v->cor){
-				imprime_debug("Filho cor igual");
 				filho->comunidade = 1;
 				filho->indice = v->indice;
 				busca_comunidade(filho);
@@ -446,9 +431,7 @@ void busca_comunidade(vertice v){
 	no aux;
 	for (aux = primeiro_no(v->vizinhos); aux; aux = proximo_no(aux)) {
 		filho = conteudo(aux);
-		//printf("com: %d cor: %d cor-p: %d i: %d j: %d\n", filho->comunidade, filho->cor, v->cor, filho->l, filho->c);
 		if(!filho->comunidade && filho->cor == v->cor){ // se o filho nao tem comunidade e tem a mesma cor do pai
-			//printf("cor: %d i: %d j: %d\n", filho->cor, filho->l, filho->c);
 			filho->comunidade = 1;
 			filho->indice = v->indice;
 			busca_comunidade(filho);
@@ -476,16 +459,16 @@ lista cria_componentes(grafo g) {
 	vertice raiz = conteudo(aux);
 	if (raiz->l != 0 && raiz->c != 0)
 	{
-		printf("Erro no acesso à raiz;\n");
+		//printf("Erro no acesso à raiz;\n");
 		return NULL;
 	}
-	imprime_debug("seta parametros");
+	////imprime_debug("seta parametros");
 	// geração dos indices
 	set_parametro(g->vertices, 0, 0); // reseta todos os vertices para nao visitados
 	set_parametro(g->vertices, 1, 0); // reseta todos os vertices para nao comunidade
 	set_parametro(g->vertices, 2, 0); // reseta todos os vertices para indice 0
 
-	imprime_debug("fim seta parametros");
+	//imprime_debug("fim seta parametros");
 	
 	vertice filho;
 	int *ind_cont;
@@ -493,26 +476,30 @@ lista cria_componentes(grafo g) {
 	*ind_cont = 2;
 	raiz->indice = 1;
 	raiz->comunidade = 1;
+	raiz->visitado = 1;
 
-	imprime_debug("indice raiz");
+	//imprime_debug("indice raiz");
 
 	for (aux = primeiro_no(raiz->vizinhos); aux; aux = proximo_no(aux)) {
 		filho = conteudo(aux);
 		if (filho->cor == raiz->cor){
 			filho->comunidade = 1;
 			filho->indice = raiz->indice;
-			//printf("%d Fora\n", filho->cor);
+			////printf("%d Fora\n", filho->cor);
 			busca_comunidade(filho);
 		}
 	}
-	imprime_debug("fim indice raiz");
-	imprime_debug("indice filhos raiz");
+	//imprime_debug("fim indice raiz");
+	//imprime_debug("indice filhos raiz");
 	for (aux = primeiro_no(raiz->vizinhos); aux; aux = proximo_no(aux)) {
 		filho = conteudo(aux);
 		filho->visitado = 1;
+		//printf("		RAIZ CHAMOU\n");
 		gera_indice(filho, ind_cont, raiz);
 	}
-	imprime_debug("fim indice filhos raiz");
+	
+	//imprime_debug("fim indice filhos raiz");
+	imprime_grafo(g);
 	free(ind_cont);
 	// criar lista de indice;
 	int *ind_aux;
@@ -521,65 +508,110 @@ lista cria_componentes(grafo g) {
 	lista componentes = constroi_lista();
 	vertice componente, v_aux, v_aux2, v_aux3, v_aux4;
 	no aux2, aux3;
-	imprime_debug("meu for");
+	//imprime_debug("meu for");
+	
+	// cria lista de indices
 	for(aux = primeiro_no(g->vertices); aux; aux = proximo_no(aux)){
 		v_aux = conteudo(aux);
-		imprime_lista(indices);
 		if (!existe_indice(indices, v_aux->indice)) { // se nao existe o indice na lista ele adiciona (so precisa de 1 representante do indice na lista)
 			ind_aux = malloc(sizeof(int));
-			v_aux2 = constroi_vertice();
 			*ind_aux = v_aux->indice;
-			printf("%d", v_aux->indice);
 			insere_lista(ind_aux, indices);
-			//imprime_lista(indices);
-			for(aux2 = primeiro_no(g->vertices); aux2; aux2 = proximo_no(aux2)){
-				v_aux2 = conteudo(aux2);
-				if(v_aux2->indice == v_aux->indice){
-					tanalista =  0 ;
-					if (tamanho_lista(componentes)){
-						for (aux3 = primeiro_no(componentes); aux3; aux3 = proximo_no(aux3)) {
-							v_aux3 = conteudo(aux3);
-							if (v_aux3->indice == v_aux2->indice){
-								tanalista = 1;
-								componente = v_aux3;
-								break;
-							}
+		}
+	}
+	
+	for(aux = primeiro_no(indices); aux; aux = proximo_no(aux)){
+		ind_aux = conteudo(aux);
+		v_aux = constroi_vertice();
+		v_aux->indice = *ind_aux;
+		insere_lista(v_aux, componentes);
+	}
+	
+	for(aux = primeiro_no(componentes); aux; aux = proximo_no(aux)){
+		v_aux = conteudo(aux);
+		for(aux2 = primeiro_no(g->vertices); aux2; aux2 = proximo_no(aux2)){
+			v_aux2 = conteudo(aux2);
+			if(v_aux2->indice == v_aux->indice){
+				for(aux3 = primeiro_no(v_aux2->vizinhos); aux3; aux3 = proximo_no(aux3)){
+					v_aux3 = conteudo(aux3);
+					if(v_aux2->indice != v_aux3->indice){
+						if(!existe_vertice_indice(v_aux->vizinhos, v_aux3)){
+							v_aux4 = busca_indice(componentes, v_aux3); // buscar o vertice equivalente na lista de componentes
+	 						insere_lista(v_aux4, v_aux->vizinhos);
+							if(!existe_vertice_indice(v_aux4->vizinhos, v_aux))
+								insere_lista(v_aux, v_aux4->vizinhos);
 						}
 					}
-					if (!tanalista){ // v_aux3 != vertice do componente
-						componente = constroi_vertice();
-						componente->indice = v_aux2->indice;
-						componente->vizinhos = constroi_lista();
-						insere_lista(componente, componentes);
-					}
-
-					for (aux3 = primeiro_no(v_aux2->vizinhos); aux3; aux3 = proximo_no(aux3)) {
-						v_aux3 = conteudo(aux3);
-						if (v_aux3->indice != v_aux2->indice){
-							v_aux4 = busca_indice(componentes, v_aux3); // retorna vertice equivalente ao indice do v_aux3 na lista de componentes
-			imprime_debug("indices");
-							if (!v_aux4){
-								v_aux4 = constroi_vertice();
-								v_aux4->indice = v_aux3->indice;
-								v_aux4->vizinhos = constroi_lista();
-								insere_lista(v_aux4, componentes);
-							}
-							if(!existe_vertice_indice(v_aux4->vizinhos, componente))
-								insere_lista(componente, v_aux4->vizinhos);
-							if(!existe_vertice_indice(componente->vizinhos, v_aux4))
-								insere_lista(v_aux4, componente->vizinhos);
-						}
-					}
-				}
+				}	
 			}
 		}
 	}
-	imprime_debug("fim meu for");
+	
+	
+	// for(aux = primeiro_no(g->vertices); aux; aux = proximo_no(aux)){
+	// 	v_aux = conteudo(aux);
+	// 	imprime_lista(indices);
+	// 	if (!existe_indice(indices, v_aux->indice)) { // se nao existe o indice na lista ele adiciona (so precisa de 1 representante do indice na lista)
+	// 		ind_aux = malloc(sizeof(int));
+	// 		v_aux2 = constroi_vertice();
+	// 		*ind_aux = v_aux->indice;
+	// 		//printf("%d", v_aux->indice);
+	// 		insere_lista(ind_aux, indices);
+	// 		//imprime_lista(indices);
+	// 		for(aux2 = primeiro_no(g->vertices); aux2; aux2 = proximo_no(aux2)){
+	// 			v_aux2 = conteudo(aux2);
+	// 			if(v_aux2->indice == v_aux->indice){
+	// 				tanalista =  0 ;
+	// 				if (tamanho_lista(componentes)){
+	// 					for (aux3 = primeiro_no(componentes); aux3; aux3 = proximo_no(aux3)) {
+	// 						v_aux3 = conteudo(aux3);
+	// 						if (v_aux3->indice == v_aux2->indice){
+	// 							tanalista = 1;
+	// 							componente = v_aux3;
+	// 							break;
+	// 						}
+	// 					}
+	// 				}
+	// 				if (!tanalista){ // v_aux3 != vertice do componente
+	// 					componente = constroi_vertice();
+	// 					componente->indice = v_aux2->indice;
+	// 					componente->vizinhos = constroi_lista();
+	// 					insere_lista(componente, componentes);
+	// 				}
 
+	// 				for (aux3 = primeiro_no(v_aux2->vizinhos); aux3; aux3 = proximo_no(aux3)) {
+	// 					v_aux3 = conteudo(aux3);
+	// 					if (v_aux3->indice != v_aux2->indice){
+	// 						v_aux4 = busca_indice(componentes, v_aux3); // retorna vertice equivalente ao indice do v_aux3 na lista de componentes
+	// 		//imprime_debug("indices");
+	// 						if (!v_aux4){
+	// 							v_aux4 = constroi_vertice();
+	// 							v_aux4->indice = v_aux3->indice;
+	// 							v_aux4->vizinhos = constroi_lista();
+	// 							insere_lista(v_aux4, componentes);
+	// 						}
+	// 						if(!existe_vertice_indice(v_aux4->vizinhos, componente))
+	// 							insere_lista(componente, v_aux4->vizinhos);
+	// 						if(!existe_vertice_indice(componente->vizinhos, v_aux4))
+	// 							insere_lista(v_aux4, componente->vizinhos);
+	// 					}
+	// 				}
+	// 			}
+	// 		}
+	// 	}
+	// }
+	//imprime_debug("fim meu for");
+	
+	for(aux = primeiro_no(componentes); aux; aux = proximo_no(aux)){
+		v_aux = conteudo(aux);
+		//printf("	INDICE: %d\n", v_aux->indice);
+		
+	}
+	
 	destroi_lista(indices, NULL);
 
 	set_parametro(g->vertices, 0, 0); // reseta todos os vertices para nao visitados
-	printf("comp %d\n", tamanho_lista(componentes));
+	//printf("comp %d\n", tamanho_lista(componentes));
 	return componentes;
 
 }
@@ -587,14 +619,26 @@ lista cria_componentes(grafo g) {
 //h(n);
 int h (lista componentes){
 	no aux, aux2;
-	vertice v_aux, v_aux2;
+	vertice v, v2, v_aux, v_aux2;
 	
-	if (tamanho_lista(componentes) == 1){ // jogo acabou
+	if (tamanho_lista(componentes) == 1){
+		//imprime_debug("ACBOUUUU");// jogo acabou
 		return 0;
 	}
 	
 	
 	// fila de prioridades <- raiz (lista componentes) verificar se o primeiro elemento da lista é realmente a raiz
+	
+	//printf("IMPRIME COMPONENTES:\n");
+	for(no n = primeiro_no(componentes); n; n = proximo_no(n)){
+		v = conteudo(n);
+		//printf("%d\n",  v->indice);
+		for(no n2 = primeiro_no(v->vizinhos); n2; n2 = proximo_no(n2)){
+			v2 = conteudo(n2);
+			//printf("	%d\n", v2->indice);
+		}
+		
+	}
 	aux = primeiro_no(componentes);
 	v_aux = conteudo(aux);
 	v_aux->visitado = 1;
@@ -603,40 +647,43 @@ int h (lista componentes){
 
 	// for (aux; aux; proximo_no(aux)){
 	// 	v_aux2 = conteudo(aux);
-	// 	printf("i: %d, j: %d indice %d, tamanho %d\n", v_aux2->indice, tamanho_lista(componentes));
+	// 	//printf("i: %d, j: %d indice %d, tamanho %d\n", v_aux2->indice, tamanho_lista(componentes));
 	// }
 
 	for (aux2 = primeiro_no(v_aux->vizinhos); aux2; aux2 = proximo_no(aux2)) {
 		v_aux2 = conteudo(aux2);
 		v_aux2->visitado = 1;
 		v_aux2->peso = v_aux->peso +1;
-		insere_lista(aux2, prioridades);
-		printf("indice %d\n", v_aux2->indice);
+		insere_lista(v_aux2, prioridades);
 	}
 
 	while (tamanho_lista(prioridades)){
 		aux = primeiro_no(prioridades);
 		v_aux = conteudo(aux);
-		
-		imprime_debug("teste");
+		//printf("INDICE: %d PESO: %d\n", v_aux->indice, v_aux->peso);
+		//imprime_debug("teste");
+		//printf("TAM VIZINHOS: %d\n", tamanho_lista(v_aux->vizinhos));
+		//imprime_debug("teste2");
 		for (aux2 = primeiro_no(v_aux->vizinhos); aux2; aux2 = proximo_no(aux2)) {
 			v_aux2 = conteudo(aux2);
 			if (!v_aux2->visitado) {
 				v_aux2->visitado = 1;
 				v_aux2->peso = v_aux->peso +1;
-				insere_lista(aux2, prioridades);
+				insere_lista(v_aux2, prioridades);
 			}
 		}
 		tira_no(prioridades, aux);
 	}
 	int maior = 0;
-	for (aux = primeiro_no(componentes); aux2; aux2 = proximo_no(aux)) {
+	//printf("TAM COMPONENTES: %d\n", tamanho_lista(componentes));
+	for (aux = primeiro_no(componentes); aux; aux = proximo_no(aux)) {
 		v_aux = conteudo(aux);
 		if (v_aux->peso > maior) {
 			maior = v_aux->peso;
 		}
 	}
 	free(prioridades);
+	//printf("MAIOR: %d\n", maior);
 	return maior;
 }
 
@@ -649,61 +696,62 @@ lista A_estrela (tmapa *m){
 	lista passos;
 	int *passo;
 	grafo g = le_grafo(m);
-	//imprime_grafo(g);
+	imprime_grafo(g);
 	grafo g2;
 	
-	imprime_debug("cria componentes");
+	//imprime_debug("cria componentes");
 	lista componentes = cria_componentes(g);
-	imprime_debug("fim cria componentes");
+	//imprime_debug("fim cria componentes");
 	
 	aux = primeiro_no(componentes);
 	v_aux = conteudo(aux);
-	imprime_debug("joga filhos raiz");
+	//imprime_debug("joga filhos raiz");
 	for (aux2 = primeiro_no(v_aux->vizinhos); aux2; aux2 = proximo_no(aux2)) {
 		v_aux2 = conteudo(aux2);
 		g2 = copia_grafo(g);
-		joga(busca_indice_cor(g->vertices, v_aux2->indice), v_aux->indice, g2);
+		passo = malloc(sizeof(int));
+		*passo = busca_indice_cor(g->vertices, v_aux2->indice);
+		joga(*passo, v_aux->indice, g2);
 		nob = constroi_nobusca();
 		nob->hn = h(componentes);
 		nob->g = 1;
-		passo = malloc(sizeof(int));
-		*passo = v_aux2->cor;
 		insere_lista(passo, nob->passos);
 		nob->grafomapa = g2;
 		insere_lista(nob, prioridades);
 		
 	}
 	destroi_lista(componentes, destroi_vertice);
-	imprime_debug("fim joga filhos raiz");
+	//imprime_debug("fim joga filhos raiz");
 	
-	imprime_debug("joga lista prioridades");
+	//imprime_debug("joga lista prioridades");
 	while (tamanho_lista(prioridades)){
 		aux = menorfn(prioridades);
 		pai = conteudo(aux);
+		//printf("Altura: %d\n", pai->g);
 		componentes = cria_componentes(pai->grafomapa);
 		nocomponente = primeiro_no(componentes);
 		v_aux = conteudo(nocomponente);
+		if (tamanho_lista(componentes) == 1){
+			lista resultado = constroi_lista();
+			copia_lista_cor(pai->passos, resultado);
+			destroi_lista(prioridades, destroi_nobusca);
+			destroi_lista(componentes, destroi_vertice);
+			return resultado;
+		}
 		
 		for (aux2 = primeiro_no(v_aux->vizinhos); aux2; aux2 = proximo_no(aux2)) {
 			v_aux2 = conteudo(aux2);
 			g2 = copia_grafo(pai->grafomapa);
-			joga(busca_indice_cor(g->vertices, v_aux2->indice), v_aux->indice, g2);
+			passo = malloc(sizeof(int));
+			*passo = busca_indice_cor(g->vertices, v_aux2->indice);
+			joga(*passo, v_aux->indice, g2);
 			nob = constroi_nobusca();
 			nob->hn = h(componentes);
 			nob->g = pai->g +1;
 			copia_lista_cor(pai->passos, nob->passos);
-			passo = malloc(sizeof(int));
-			*passo = v_aux2->cor;
 			insere_lista(passo, nob->passos);
 			nob->grafomapa = g2;
 			insere_lista(nob, prioridades);
-			if (nob->hn == 0){
-				lista resultado = constroi_lista();
-				copia_lista_cor(nob->passos, resultado);
-				destroi_lista(prioridades, destroi_nobusca);
-				destroi_lista(componentes, destroi_vertice);
-				return resultado;
-			}
 		}
 		
 		
@@ -711,7 +759,7 @@ lista A_estrela (tmapa *m){
 		destroi_lista(componentes, destroi_vertice);
 		destroi_nobusca(pai);
 	}
-	imprime_debug("fim joga lista prioridades");
+	//imprime_debug("fim joga lista prioridades");
 
 }
 

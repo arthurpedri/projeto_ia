@@ -50,9 +50,7 @@ int main(int argc, char **argv) {
   // printf("nossa func\n");
   // #endif
   
-  
-  
-  
+  printf("%d\n", tamanho_lista(resultado));
   imprime_lista(resultado);
   /*
 
