@@ -1,0 +1,25 @@
+Arthur Pedri Trevisol GRR20141784
+Arthur Carvalho de Queiroz GRR20141754
+
+ARQUIVOS:
+    main.c - programa que recebe entrada e chama função principal de execução.
+    grafo.c -  todas as estruturas e funções referentes
+
+Relatório
+
+Implementamos uma heurística que busca as cores mais distantes da raiz dado um mapa.
+Essa cor mais distante é, resumidamente, o componente de cor mais distante.
+Dentre todos os menores caminhos do componente da raiz e todos os componentes, 
+escolher o maior menor caminho.
+
+Nós implementamos um A*, que está no arquivo grafo.c função A_estrela(). 
+Entretanto esse algorítimo só roda em tempo hábil valores pequenos como 8x8 com 3 cores.
+
+Como não conseguimos otimizar o A* o suficiente para o desafio proposto, usamos 
+a nossa heurística para um algoritmo guloso, a partir da raiz o melhor caminho é
+escolhido e então é executado, a heurística só será executada novamente se ao final  
+do primeiro caminho escolhido o jogo não estiver terminado.
+
+Na maioria dos casos que testamos o nosso programa encontrou soluções com menos
+etapas do que o h1 e o h2.
+

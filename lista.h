@@ -68,5 +68,6 @@ int destroi_lista(lista l, int destroi(void *));
 
 int remove_no(struct lista *l, struct no *rno, int destroi(void *));
 
-int tira_no(struct lista *l, struct no *rno);
+// int tira_no(struct lista *l, struct no *rno);
+int remove_no_dry(struct lista *l, struct no *rno, int destroi(void *));
 #endif

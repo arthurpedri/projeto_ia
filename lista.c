@@ -151,19 +151,42 @@ int remove_no(struct lista *l, struct no *rno, int destroi(void *)) {
 	return 0;
 }
 
-int tira_no(struct lista *l, struct no *rno) {
+int remove_no_dry(struct lista *l, struct no *rno, int destroi(void *)) {
 	int r = 1;
 	if (l->primeiro == rno) {
 		l->primeiro = rno->proximo;
+		if (destroi != NULL) {
+			r = destroi(conteudo(rno));
+		}
 		l->tamanho--;
 		return r;
 	}
 	for (no n = primeiro_no(l); n->proximo; n = proximo_no(n)) {
 		if (n->proximo == rno) {
 			n->proximo = rno->proximo;
+			if (destroi != NULL) {
+				r = destroi(conteudo(rno));
+			}
 			l->tamanho--;
 			return r;
 		}
 	}
 	return 0;
 }
+
+// int tira_no(struct lista *l, struct no *rno) {
+// 	int r = 1;
+// 	if (l->primeiro == rno) {
+// 		l->primeiro = rno->proximo;
+// 		l->tamanho--;
+// 		return r;
+// 	}
+// 	for (no n = primeiro_no(l); n->proximo; n = proximo_no(n)) {
+// 		if (n->proximo == rno) {
+// 			n->proximo = rno->proximo;
+// 			l->tamanho--;
+// 			return r;
+// 		}
+// 	}
+// 	return 0;
+// }

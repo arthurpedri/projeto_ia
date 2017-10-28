@@ -1,4 +1,4 @@
-CFLAGS  = -g -std=c99
+CFLAGS  = -g -std=c99 -O3
 
 all: lista mapa grafo princ outro
 

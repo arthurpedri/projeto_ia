@@ -8,58 +8,27 @@ int main(int argc, char **argv) {
   int cor;
   tmapa m;
   int semente;
+  
+  int i, j;
 
-  if(argc < 4 || argc > 5) {
-    printf("uso: %s <numero_de_linhas> <numero_de_colunas> <numero_de_cores> [<semente_aleatoria>]\n", argv[0]);
-    exit(1);
+  scanf("%d", &(m.nlinhas));
+  scanf("%d", &(m.ncolunas));
+  scanf("%d", &(m.ncores));
+  m.mapa = (int**) malloc(m.nlinhas * sizeof(int*));
+  for(i = 0; i < m.nlinhas; i++) {
+    m.mapa[i] = (int*) malloc(m.ncolunas * sizeof(int));
+    for(j = 0; j < m.ncolunas; j++)
+      scanf("%d", &(m.mapa[i][j]));
   }
-  m.nlinhas = atoi(argv[1]);
-  m.ncolunas = atoi(argv[2]);
-  m.ncores = atoi(argv[3]);
-
-  if(argc == 5)
-    semente = atoi(argv[4]);
-  else
-    semente = -1;
+  
   gera_mapa(&m, semente);
   mostra_mapa_cor(&m);
   
-  lista resultado = A_estrela(&m);
-  
-  // lista resultado = constroi_lista();
-  // int *um, *dois;
-  // um = malloc(sizeof(int));
-  // dois = malloc(sizeof(int));
-  
-  // *um = 1;
-  // *dois = 2;
-  
-  
-  // insere_lista(um, resultado);
-  // no aux = primeiro_no(resultado);
-  // int *cont = conteudo(aux);
-  // printf("1 %d\n", *cont);
-  
-  // insere_lista(um, resultado);
-  
-  // aux = proximo_no(aux);
-  // cont = conteudo(aux);
-  
-  // printf("2 %d\n", *cont);
-  // #ifndef DEBUG
-  // printf("nossa func\n");
-  // #endif
-  
+  lista resultado = A_estrela_simples(&m);
+
   printf("%d\n", tamanho_lista(resultado));
   imprime_lista(resultado);
-  /*
 
-  scanf("%d", &cor);
-  while(cor > 0 && cor <= m.ncores) {
-    pinta_mapa(&m, cor);
-    mostra_mapa_cor(&m); // para mostrar sem cores use mostra_mapa(&m);
-    scanf("%d", &cor);
-  }*/
 
   return 0;
 }

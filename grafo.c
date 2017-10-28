@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "grafo.h"
+#define MAX_PRIORI 50
 
 struct vertice
 {
@@ -12,6 +13,7 @@ struct vertice
 	int indice;
 	int comunidade;
 	int peso;
+	lista passos;
 	lista vizinhos;
 };
 
@@ -41,10 +43,10 @@ void imprime_grafo(grafo g){
 	vertice v, v2;
 	for(no n = primeiro_no(g->vertices); n; n = proximo_no(n)){
 		v = conteudo(n);
-		//printf("%d - [%d,%d] -> %d\n", v->cor, v->l, v->c, v->indice);
+		printf("%d - [%d,%d] -> %d\n", v->cor, v->l, v->c, v->indice);
 		for(no n2 = primeiro_no(v->vizinhos); n2; n2 = proximo_no(n2)){
 			v2 = conteudo(n2);
-			//printf("	%d - [%d,%d]\n", v2->cor, v2->l, v2->c);
+			printf("	%d - [%d,%d]\n", v2->cor, v2->l, v2->c);
 		}
 		
 	}
@@ -79,6 +81,7 @@ static vertice constroi_vertice(void) {
 	v->comunidade = 0;
 	v->peso = 0;
 	v->vizinhos = constroi_lista();
+	v->passos = constroi_lista();
 	return v;
 }
 
@@ -186,8 +189,9 @@ static int destroi_vertice(void *p) {
 	vertice v = p;
     if (v) {
 		no n;
-		if ((destroi_lista(v->vizinhos, NULL))){
+		if ((destroi_lista(v->vizinhos, NULL) && (destroi_lista(v->passos, NULL)))){
 			v->vizinhos = NULL;
+			v->passos = NULL;
 			free (v);
 			v = NULL;
 			return 1;
@@ -196,18 +200,6 @@ static int destroi_vertice(void *p) {
         return 0;
     }
 }
-
-/*
-struct nobusca
-{
-	int peso;
-	int hn;
-	int g;
-	lista passos;
-	lista filhos;
-	grafo grafomapa;
-};
-*/
 
 static int destroi_nobusca(void *p) {
 	nobusca v = p;
@@ -224,6 +216,7 @@ static int destroi_nobusca(void *p) {
         return 0;
     }
 }
+
 
 //------------------------------------------------------------------------------
 // Insere nas listas de adjacências dos vértices envolvidos a alteração na vizinhança.
@@ -459,16 +452,13 @@ lista cria_componentes(grafo g) {
 	vertice raiz = conteudo(aux);
 	if (raiz->l != 0 && raiz->c != 0)
 	{
-		//printf("Erro no acesso à raiz;\n");
 		return NULL;
 	}
-	////imprime_debug("seta parametros");
 	// geração dos indices
 	set_parametro(g->vertices, 0, 0); // reseta todos os vertices para nao visitados
 	set_parametro(g->vertices, 1, 0); // reseta todos os vertices para nao comunidade
 	set_parametro(g->vertices, 2, 0); // reseta todos os vertices para indice 0
 
-	//imprime_debug("fim seta parametros");
 	
 	vertice filho;
 	int *ind_cont;
@@ -478,28 +468,22 @@ lista cria_componentes(grafo g) {
 	raiz->comunidade = 1;
 	raiz->visitado = 1;
 
-	//imprime_debug("indice raiz");
 
 	for (aux = primeiro_no(raiz->vizinhos); aux; aux = proximo_no(aux)) {
 		filho = conteudo(aux);
 		if (filho->cor == raiz->cor){
 			filho->comunidade = 1;
 			filho->indice = raiz->indice;
-			////printf("%d Fora\n", filho->cor);
 			busca_comunidade(filho);
 		}
 	}
-	//imprime_debug("fim indice raiz");
-	//imprime_debug("indice filhos raiz");
 	for (aux = primeiro_no(raiz->vizinhos); aux; aux = proximo_no(aux)) {
 		filho = conteudo(aux);
 		filho->visitado = 1;
-		//printf("		RAIZ CHAMOU\n");
 		gera_indice(filho, ind_cont, raiz);
 	}
 	
-	//imprime_debug("fim indice filhos raiz");
-	imprime_grafo(g);
+
 	free(ind_cont);
 	// criar lista de indice;
 	int *ind_aux;
@@ -508,7 +492,6 @@ lista cria_componentes(grafo g) {
 	lista componentes = constroi_lista();
 	vertice componente, v_aux, v_aux2, v_aux3, v_aux4;
 	no aux2, aux3;
-	//imprime_debug("meu for");
 	
 	// cria lista de indices
 	for(aux = primeiro_no(g->vertices); aux; aux = proximo_no(aux)){
@@ -548,72 +531,93 @@ lista cria_componentes(grafo g) {
 	}
 	
 	
-	// for(aux = primeiro_no(g->vertices); aux; aux = proximo_no(aux)){
-	// 	v_aux = conteudo(aux);
-	// 	imprime_lista(indices);
-	// 	if (!existe_indice(indices, v_aux->indice)) { // se nao existe o indice na lista ele adiciona (so precisa de 1 representante do indice na lista)
-	// 		ind_aux = malloc(sizeof(int));
-	// 		v_aux2 = constroi_vertice();
-	// 		*ind_aux = v_aux->indice;
-	// 		//printf("%d", v_aux->indice);
-	// 		insere_lista(ind_aux, indices);
-	// 		//imprime_lista(indices);
-	// 		for(aux2 = primeiro_no(g->vertices); aux2; aux2 = proximo_no(aux2)){
-	// 			v_aux2 = conteudo(aux2);
-	// 			if(v_aux2->indice == v_aux->indice){
-	// 				tanalista =  0 ;
-	// 				if (tamanho_lista(componentes)){
-	// 					for (aux3 = primeiro_no(componentes); aux3; aux3 = proximo_no(aux3)) {
-	// 						v_aux3 = conteudo(aux3);
-	// 						if (v_aux3->indice == v_aux2->indice){
-	// 							tanalista = 1;
-	// 							componente = v_aux3;
-	// 							break;
-	// 						}
-	// 					}
-	// 				}
-	// 				if (!tanalista){ // v_aux3 != vertice do componente
-	// 					componente = constroi_vertice();
-	// 					componente->indice = v_aux2->indice;
-	// 					componente->vizinhos = constroi_lista();
-	// 					insere_lista(componente, componentes);
-	// 				}
-
-	// 				for (aux3 = primeiro_no(v_aux2->vizinhos); aux3; aux3 = proximo_no(aux3)) {
-	// 					v_aux3 = conteudo(aux3);
-	// 					if (v_aux3->indice != v_aux2->indice){
-	// 						v_aux4 = busca_indice(componentes, v_aux3); // retorna vertice equivalente ao indice do v_aux3 na lista de componentes
-	// 		//imprime_debug("indices");
-	// 						if (!v_aux4){
-	// 							v_aux4 = constroi_vertice();
-	// 							v_aux4->indice = v_aux3->indice;
-	// 							v_aux4->vizinhos = constroi_lista();
-	// 							insere_lista(v_aux4, componentes);
-	// 						}
-	// 						if(!existe_vertice_indice(v_aux4->vizinhos, componente))
-	// 							insere_lista(componente, v_aux4->vizinhos);
-	// 						if(!existe_vertice_indice(componente->vizinhos, v_aux4))
-	// 							insere_lista(v_aux4, componente->vizinhos);
-	// 					}
-	// 				}
-	// 			}
-	// 		}
-	// 	}
-	// }
-	//imprime_debug("fim meu for");
+	
 	
 	for(aux = primeiro_no(componentes); aux; aux = proximo_no(aux)){
 		v_aux = conteudo(aux);
-		//printf("	INDICE: %d\n", v_aux->indice);
 		
 	}
 	
 	destroi_lista(indices, NULL);
 
 	set_parametro(g->vertices, 0, 0); // reseta todos os vertices para nao visitados
-	//printf("comp %d\n", tamanho_lista(componentes));
 	return componentes;
 
+}
+
+int existe_vizinhanca (vertice original, int indice){
+	no aux2;
+	vertice v_aux2;
+	for (aux2 = primeiro_no(original->vizinhos); aux2; aux2 = proximo_no(aux2)) {
+		v_aux2 = conteudo(aux2);
+		if (v_aux2->indice == indice)
+			return 1;
+	}
+	return 0;
+}
+
+//h(n);
+lista h_simples (lista componentes, grafo g){
+	no aux, aux2, aux3;
+	vertice v, v2, v_aux, v_aux2, v_aux3;
+	
+	if (tamanho_lista(componentes) == 1){
+		return 0;
+	}
+	set_parametro(componentes, 0, 0);
+	int *passo;
+	aux = primeiro_no(componentes);
+	v_aux = conteudo(aux);
+	v_aux->visitado = 1;
+	v_aux->peso = 0;
+	lista prioridades = constroi_lista();
+
+	for (aux2 = primeiro_no(v_aux->vizinhos); aux2; aux2 = proximo_no(aux2)) {
+		v_aux2 = conteudo(aux2);
+		v_aux2->visitado = 1;
+		passo = malloc(sizeof(int));
+ 		*passo = busca_indice_cor(g->vertices, v_aux2->indice);
+		insere_lista(passo, v_aux2->passos);
+ 		insere_lista(v_aux2, prioridades);
+		v_aux2->peso = v_aux->peso +1;
+	}
+
+	while (tamanho_lista(prioridades)){
+		aux = primeiro_no(prioridades);
+		v_aux = conteudo(aux);
+		for (aux2 = primeiro_no(v_aux->vizinhos); aux2; aux2 = proximo_no(aux2)) {
+			v_aux2 = conteudo(aux2);
+			if (!v_aux2->visitado) {
+				v_aux2->visitado = 1;
+				v_aux2->peso = v_aux->peso + 1;
+				copia_lista_cor(v_aux->passos, v_aux2->passos);
+				passo = malloc(sizeof(int));
+ 				*passo = busca_indice_cor(g->vertices, v_aux2->indice);
+				insere_lista(passo, v_aux2->passos);
+				insere_lista(v_aux2, prioridades);
+				
+			}
+		}
+		remove_no_dry(prioridades, aux, NULL);
+	}
+	int maior = 0;
+	lista resultado = constroi_lista();
+	for (aux = primeiro_no(componentes); aux; aux = proximo_no(aux)) {
+		v_aux = conteudo(aux);
+		if (v_aux->peso > maior) {
+			maior = v_aux->peso;
+			aux2 = aux;
+		}
+	}
+	
+	for (aux = primeiro_no(componentes); aux; aux = proximo_no(aux)) {
+		v_aux = conteudo(aux);
+		if (aux2 == aux) {
+			copia_lista_cor(v_aux->passos, resultado);
+		}
+	}
+	free(prioridades);
+	return resultado;
 }
 
 //h(n);
@@ -622,20 +626,16 @@ int h (lista componentes){
 	vertice v, v2, v_aux, v_aux2;
 	
 	if (tamanho_lista(componentes) == 1){
-		//imprime_debug("ACBOUUUU");// jogo acabou
 		return 0;
 	}
 	
 	
 	// fila de prioridades <- raiz (lista componentes) verificar se o primeiro elemento da lista é realmente a raiz
 	
-	//printf("IMPRIME COMPONENTES:\n");
 	for(no n = primeiro_no(componentes); n; n = proximo_no(n)){
 		v = conteudo(n);
-		//printf("%d\n",  v->indice);
 		for(no n2 = primeiro_no(v->vizinhos); n2; n2 = proximo_no(n2)){
 			v2 = conteudo(n2);
-			//printf("	%d\n", v2->indice);
 		}
 		
 	}
@@ -645,10 +645,6 @@ int h (lista componentes){
 	v_aux->peso = 0;
 	lista prioridades = constroi_lista();
 
-	// for (aux; aux; proximo_no(aux)){
-	// 	v_aux2 = conteudo(aux);
-	// 	//printf("i: %d, j: %d indice %d, tamanho %d\n", v_aux2->indice, tamanho_lista(componentes));
-	// }
 
 	for (aux2 = primeiro_no(v_aux->vizinhos); aux2; aux2 = proximo_no(aux2)) {
 		v_aux2 = conteudo(aux2);
@@ -660,10 +656,6 @@ int h (lista componentes){
 	while (tamanho_lista(prioridades)){
 		aux = primeiro_no(prioridades);
 		v_aux = conteudo(aux);
-		//printf("INDICE: %d PESO: %d\n", v_aux->indice, v_aux->peso);
-		//imprime_debug("teste");
-		//printf("TAM VIZINHOS: %d\n", tamanho_lista(v_aux->vizinhos));
-		//imprime_debug("teste2");
 		for (aux2 = primeiro_no(v_aux->vizinhos); aux2; aux2 = proximo_no(aux2)) {
 			v_aux2 = conteudo(aux2);
 			if (!v_aux2->visitado) {
@@ -672,10 +664,9 @@ int h (lista componentes){
 				insere_lista(v_aux2, prioridades);
 			}
 		}
-		tira_no(prioridades, aux);
+		remove_no_dry(prioridades, aux, NULL);
 	}
 	int maior = 0;
-	//printf("TAM COMPONENTES: %d\n", tamanho_lista(componentes));
 	for (aux = primeiro_no(componentes); aux; aux = proximo_no(aux)) {
 		v_aux = conteudo(aux);
 		if (v_aux->peso > maior) {
@@ -683,29 +674,46 @@ int h (lista componentes){
 		}
 	}
 	free(prioridades);
-	//printf("MAIOR: %d\n", maior);
 	return maior;
+}
+
+void otimiza_prioridades (lista l, struct no *pai){
+	no aux, p;
+	p = primeiro_no(l);
+	 while (aux = proximo_no(p)) {
+		if (pai != p){
+			remove_no(l, p, destroi_nobusca);
+		}
+			p = aux;
+
+	 }
+}
+
+void insere_lista_priori(nobusca nb, lista prioridades, no pai){
+	no aux;
+	if(tamanho_lista(prioridades) > MAX_PRIORI){
+		aux = maiorfn(prioridades, pai);
+		remove_no(prioridades, aux, destroi_nobusca);
+			
+	}
+	insere_lista(nb, prioridades);
 }
 
 lista A_estrela (tmapa *m){
 	
 	no aux, aux2, nocomponente;
 	vertice v_aux, v_aux2;
-	nobusca nob, pai;
+	nobusca nob, auxnob, pai;
 	lista prioridades = constroi_lista();
 	lista passos;
 	int *passo;
 	grafo g = le_grafo(m);
-	imprime_grafo(g);
 	grafo g2;
 	
-	//imprime_debug("cria componentes");
 	lista componentes = cria_componentes(g);
-	//imprime_debug("fim cria componentes");
 	
 	aux = primeiro_no(componentes);
 	v_aux = conteudo(aux);
-	//imprime_debug("joga filhos raiz");
 	for (aux2 = primeiro_no(v_aux->vizinhos); aux2; aux2 = proximo_no(aux2)) {
 		v_aux2 = conteudo(aux2);
 		g2 = copia_grafo(g);
@@ -714,20 +722,17 @@ lista A_estrela (tmapa *m){
 		joga(*passo, v_aux->indice, g2);
 		nob = constroi_nobusca();
 		nob->hn = h(componentes);
-		nob->g = 1;
+		nob->g = 0;
 		insere_lista(passo, nob->passos);
 		nob->grafomapa = g2;
 		insere_lista(nob, prioridades);
 		
 	}
 	destroi_lista(componentes, destroi_vertice);
-	//imprime_debug("fim joga filhos raiz");
-	
-	//imprime_debug("joga lista prioridades");
+	int menor;
 	while (tamanho_lista(prioridades)){
 		aux = menorfn(prioridades);
 		pai = conteudo(aux);
-		//printf("Altura: %d\n", pai->g);
 		componentes = cria_componentes(pai->grafomapa);
 		nocomponente = primeiro_no(componentes);
 		v_aux = conteudo(nocomponente);
@@ -738,9 +743,10 @@ lista A_estrela (tmapa *m){
 			destroi_lista(componentes, destroi_vertice);
 			return resultado;
 		}
-		
+		menor = (pai->g + pai->hn)*3;
 		for (aux2 = primeiro_no(v_aux->vizinhos); aux2; aux2 = proximo_no(aux2)) {
 			v_aux2 = conteudo(aux2);
+			v_aux2->comunidade++;
 			g2 = copia_grafo(pai->grafomapa);
 			passo = malloc(sizeof(int));
 			*passo = busca_indice_cor(g->vertices, v_aux2->indice);
@@ -748,18 +754,68 @@ lista A_estrela (tmapa *m){
 			nob = constroi_nobusca();
 			nob->hn = h(componentes);
 			nob->g = pai->g +1;
+			
 			copia_lista_cor(pai->passos, nob->passos);
 			insere_lista(passo, nob->passos);
 			nob->grafomapa = g2;
-			insere_lista(nob, prioridades);
+			if((nob->hn + nob->g) < menor){
+				menor = nob->hn + nob->g;
+				insere_lista(nob, prioridades);
+			}
+			else{
+				destroi_nobusca(nob);
+			}
 		}
 		
-		
-		tira_no(prioridades, aux);
+		remove_no(prioridades, aux, destroi_nobusca);
 		destroi_lista(componentes, destroi_vertice);
-		destroi_nobusca(pai);
 	}
-	//imprime_debug("fim joga lista prioridades");
+
+}
+
+int indices_iguais(lista componentes){
+	no aux;
+	vertice v_aux;
+	for (aux = primeiro_no(componentes); aux; aux = proximo_no(aux)) {
+		v_aux = conteudo(aux);
+		if(v_aux->indice != 1)
+			return 0;
+	}
+	return 1;
+}
+
+lista A_estrela_simples (tmapa *m){
+	
+	no aux;
+	int* v_aux;
+	grafo g = le_grafo(m);
+	grafo g2;
+	
+	lista componentes = cria_componentes(g);
+	g2 = copia_grafo(g);
+	lista resultado = constroi_lista();
+	int *passo;
+	lista indices = h_simples(componentes, g);
+	
+	while (!indices_iguais(componentes)){
+		
+		for (aux = primeiro_no(indices); aux; aux = proximo_no(aux)) {
+			v_aux = conteudo(aux);
+			passo = malloc(sizeof(int));
+			*passo = *v_aux;
+			joga(*passo, 1, g);
+			insere_lista(passo, resultado);
+			destroi_lista(componentes, destroi_vertice);
+			componentes = cria_componentes(g);
+			
+		}
+		indices = h_simples(componentes, g);
+
+	}
+	destroi_grafo(g);
+	return resultado;
+	
+
 
 }
 
@@ -772,6 +828,46 @@ void joga (int cor, int indice, grafo g){
 	 }
 }
 
+void joga_lista (int cor, int indice, lista g, grafo graf){
+	vertice novo, novo2;
+	for (no n = primeiro_no(g); n; n=proximo_no(n)) { // percorre cada membro dos componentes
+	 	novo = conteudo(n);
+	 	for (no n2 = primeiro_no(novo->vizinhos); n2; n2=proximo_no(n2)) { // percorre os vizinhos desse membro
+	 		novo2 = conteudo(n2);
+	 		if ((novo2->indice == 1) && (busca_indice_cor(graf->vertices, novo->indice) == cor)){ // se o vizinho é raiz ou minha cor é igual a cor que está sendo pintada
+	 			joga(cor, novo->indice, graf); // grafo pintar todos os vertices que eu represento da cor sendo pintada (colocar indice 1 da raiz)
+	 			novo->indice = 0; // lista de componentes
+	 		}
+	 	}
+	 	
+	}
+	for (no n = primeiro_no(g); n; n=proximo_no(n)) {
+	 	novo = conteudo(n);
+		if (novo->indice == 0)
+	 		novo->indice =1;
+	}
+}
+
+// maior f(N) que tem o maior H(n) 
+no maiorfn (lista l, no pai){
+	nobusca novo, maior;
+	no aux = primeiro_no(l);
+	maior = conteudo(aux);
+	int maiorv = (maior->g + maior->hn);
+	for (no n_lista = primeiro_no(l); n_lista; n_lista=proximo_no(n_lista)) {
+	 	novo = conteudo(n_lista);
+	 	
+		if(pai == n_lista){
+			continue;
+		}
+		if ( ((novo->g + novo->hn) > maiorv) && pai != n_lista){
+			aux = n_lista;
+			maiorv = (novo->g + novo->hn);
+		}
+		
+	 }
+	 return aux;
+}
 
 no menorfn (lista l){
 	nobusca novo, menor;
@@ -780,10 +876,13 @@ no menorfn (lista l){
 	int menorv = (menor->g + menor->hn);
 	for (no n_lista = primeiro_no(l); n_lista; n_lista=proximo_no(n_lista)) {
 	 	novo = conteudo(n_lista);
-		if ((novo->g + novo->hn) < menorv)
+		if ((novo->g + novo->hn) < menorv){
 			aux = n_lista;
+			menorv = (novo->g + novo->hn);
+		}
 	 }
 	 return aux;
+
 }
 
 
@@ -864,215 +963,3 @@ grafo copia_grafo(grafo g){
 	}
 	return g_copy;
 }
-
-/*
-// //------------------------------------------------------------------------------
-// // devolve a vizinhança do vértice v no grafo g
-// //
-lista vizinhanca(vertice v, grafo g) {
-	if (existe_vertice(g->vertices, v)){
-		return v->vizinhos;
-	}
-}
-
-// //------------------------------------------------------------------------------
-// // devolve o grau do vértice v no grafo g
-// //
-unsigned int grau(vertice v, grafo g)
-{
-	if (existe_vertice(g->vertices, v)){
-		return tamanho_lista(v->vizinhos);
-	}
-}
-
-// //------------------------------------------------------------------------------
-// // devolve 1, se o conjunto dos vertices em l é uma clique em g, ou
-// //         0, caso contrário
-// //
-// // um conjunto C de vértices de um grafo é uma clique em g
-// // se todo vértice em C é vizinho de todos os outros vértices de C em g
-int clique(lista l, grafo g) {
-	unsigned int tam = tamanho_lista(l);
-	if (tam == 0) //Se vizinhanca eh vazia, eh clique
-		return 1;
-
-	vertice v;
-	lista vizinhos_v;
-
-	for(no n = primeiro_no(l); n && proximo_no(n) != NULL; n = proximo_no(n)) {
-		v = conteudo(n);
-		vertice pv;
-		vizinhos_v = vizinhanca(v, g);
-
-		//Se o grau do vertice != tam - 1 nao eh vizinho de todos ou tem mais vizinhos
-		if (grau(v, g) < (tam - 1)) {
-			return 0;
-		//Se o grau esta correto, precisa vericar vizinhanca
-		} else {
-			for (no prox = proximo_no(n); prox; prox = proximo_no(prox)) {
-				pv = conteudo(prox);
-				if(!existe_vertice(vizinhos_v, conteudo(prox))){
-					return 0;
-				}
-			}
-		}
-	}
-	return 1;
-}
-
-// //------------------------------------------------------------------------------
-// // devolve 1, se v é um vértice simplicial em g, ou
-// //         0, caso contrário
-// //
-// // um vértice é simplicial no grafo se sua vizinhança é uma clique
-int simplicial(vertice v, grafo g) {
-	if (existe_vertice(g->vertices, v)) {
-		if(clique(vizinhanca(v, g), g))
-			return 1;
-	}
-	return 0;
-}
-
-
-void insere_label (vertice v, int i){
-	v->label[v->indice] = i;
-	v->indice++;
-}
-
-//------------------------------------------------------------------------------
-// devolve o vertice de maior label lexicografico
-static vertice maior_label(lista l){
-	vertice maior = conteudo(primeiro_no(l));
-	vertice v_temp;
-	int tam = tamanho_lista(l);
-	no n = primeiro_no(l); // O primeiro é sempre igual ao maior
-	n = proximo_no(n); // Começa o 'for' pelo segundo nó da lista
-	for (n; n; n = proximo_no(n)) {
-		v_temp = conteudo(n);
-		if (v_temp->visitado == 0 ){
-			int i = 0;
-			while (v_temp->label[i] == maior->label[i] && i < tam && v_temp->label[i] != 0 && maior->label[i] != 0) {
-				i++;
-				if (v_temp->label[i] < maior->label[i])
-					break;
-			}
-			if (v_temp->label[i] > maior->label[i]) {
-				maior = v_temp;
-			} else {
-				return v_temp;
-			}
-		}
-	}
-	return maior;
-}
-
-//------------------------------------------------------------------------------
-// devolve uma lista de vertices com a ordem dos vértices dada por uma
-// busca em largura lexicográfica
-
-lista busca_largura_lexicografica(grafo g){
-	//Algoritmo
-	//setar label = 0 para todos os vertices
-	//label(primeiro_no) = n (|V(G)|)
-	//for i = n até 1
-	//	escolher vertice nao visitado v com maior label lexicografico
-	//	resultado[i] = v
-	//	foreach vizinho de v nao visitado w  do
-	//		label(w) = label(w).{i}
-	//	end
-	//end
-	lista ordem = constroi_lista();
-	int tam = tamanho_lista(g->vertices);
-	vertice v_temp;
-	for (no n = primeiro_no(g->vertices); n; n = proximo_no(n)) {
-		v_temp = conteudo(n);
-		v_temp->label = calloc(tam, sizeof(int));
-	}
-	vertice v = conteudo(primeiro_no(g->vertices));
-	insere_label(v, tam);
-
-	for (int i = tam ; i >= 1; i--) {
-		vertice maior = maior_label(g->vertices);
-		maior->visitado = 1;
-		insere_lista(maior, ordem);
-		for (no m = primeiro_no(maior->vizinhos); m; m = proximo_no(m)) {
-			v_temp = conteudo(m);
-			if (v_temp->visitado == 0) {
-				insere_label(v_temp, i);
-			}
-		}
-
-	}
-
-	return ordem;
-}
-
-//------------------------------------------------------------------------------
-// devolve 1, se a lista l representa uma
-//            ordem perfeita de eliminação para o grafo g ou
-//         0, ca
-//
-// o tempo de execução é O(|V(G)|+|E(G)|)
-
-int ordem_perfeita_eliminacao(lista l, grafo g){
-	vertice v, w, v_temp;
-	no n;
-	int tam_vizinhos_v, cont, i;
-
-	//reseta os vertices para nao visualizados
-	for (n = primeiro_no(l); n; n = proximo_no(n)){
-		v_temp = conteudo(n);
-		v_temp->visitado = 0;
-	}
-	//percorre a lista de ordem de eliminacao
-	for (i = 0, n = primeiro_no(l); n; n = proximo_no(n), ++i){
-		cont = tam_vizinhos_v = 0;
-		v = conteudo(n);
-
-		//marca os vizinhos de v
-		for (no aux1 = primeiro_no(v->vizinhos); aux1; aux1 = proximo_no(aux1)) {
-			v_temp = conteudo(aux1);
-			v_temp->vizinho = i; //Marca v_temp como vizinho de v
-			if (v_temp->visitado == 0){
-				tam_vizinhos_v++;
-			}
-		}
-
-		//encontra primeiro vizinho de v
-		for (no aux2 = proximo_no(n); aux2; aux2 = proximo_no(aux2)) {
-			v_temp = conteudo(aux2);
-			if(v_temp->vizinho == i) {
-				w = v_temp;
-				break;
-			}
-		}
-
-		//verifica se os vizinhos de w sao os vizinhos de v
-		for (no aux3 = primeiro_no(w->vizinhos); aux3; aux3 = proximo_no(aux3)){
-			v_temp = conteudo(aux3);
-			if(v_temp->vizinho == i){
-				cont++;
-			}
-		}
-
-		//Se a quantidade de vizinhos de w < que vizinhos de v -1,
-		//significa que v possui w e u como vizinhos, e u e w nao sao vizinhos entre si
-		if (cont < tam_vizinhos_v -1){
-			return 0;
-		}
-		i++;
-		v->visitado = 1;
-	}
-	return 1;
-}
-//------------------------------------------------------------------------------
-// devolve 1, se g é um grafo cordal ou
-//         0, caso contrário
-
-int cordal(grafo g){
-	lista ordem = constroi_lista();
-	ordem = busca_largura_lexicografica(g);
-	int a = ordem_perfeita_eliminacao(ordem, g);
-	destroi_lista(ordem, NULL);
-	return a;
-*/

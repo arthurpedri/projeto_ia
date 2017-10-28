@@ -26,12 +26,24 @@ void imprime_lista(lista l);
 
 void imprime_debug(char *c);
 
+void insere_lista_priori(nobusca nb, lista prioridades, no pai);
+
+no maiorfn (lista l, no pai);
+
+void joga_lista (int cor, int indice, lista g, grafo graf);
+
+int indices_iguais(lista componentes);
+
+
+
 //------------------------------------------------------------------------------
 // (apontador para) estrutura de dados que representa um vértice do grafo
 //
 // cada vértice tem um nome que é uma "string"
 
 typedef struct vertice *vertice;
+
+int existe_vizinhanca (vertice original, int indice);
 
 void set_parametro(lista l, int parametro, int valor);
 
@@ -45,7 +57,11 @@ lista cria_componentes(grafo g);
 
 int h (lista componentes);
 
+lista h_simples (lista componentes, grafo g);
+
 lista A_estrela (tmapa *m);
+
+lista A_estrela_simples (tmapa *m);
 
 void joga (int cor, int indice, grafo g);
 
