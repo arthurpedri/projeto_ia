@@ -2,8 +2,14 @@ Arthur Pedri Trevisol GRR20141784
 Arthur Carvalho de Queiroz GRR20141754
 
 ARQUIVOS:
+    main - Após a compilação, arquivo executável.
     main.c - programa que recebe entrada e chama função principal de execução.
-    grafo.c -  todas as estruturas e funções referentes
+    grafo.* -  todas as estruturas e funções referentes ao grafo, e funções de 
+                heurística/A*
+    lista.* - Funções e estruturas referentes as listas encadeadas usadas na
+                lista de adjacência do grafo.
+    Makefile - Makefile
+    leiame.txt - Este arquivo.
 
 Relatório
 

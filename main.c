@@ -22,7 +22,7 @@ int main(int argc, char **argv) {
   }
   
   gera_mapa(&m, semente);
-  mostra_mapa_cor(&m);
+  //mostra_mapa_cor(&m);
   
   lista resultado = A_estrela_simples(&m);
 
