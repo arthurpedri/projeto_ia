@@ -12,10 +12,14 @@ int main(int argc, char **argv) {
   grafo g = gera_grafo(k, l);
   while (1) {
     popula_grafo(g);
-    // Avalia as jogadas com min max
-    // retorna a melhor jogada;
+    // Avalia as jogadas com min max (retorna a melhor jogada)
+    minmax(g);
+
     // destroi esses vértices
+    destroi_grafo(g);
     // espera entrada
+    scanf("%c %d", &l, &k);
+    g = gera_grafo(k, l);
   }
 
 

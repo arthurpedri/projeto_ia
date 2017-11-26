@@ -441,8 +441,10 @@ void minmax(grafo g){
 
 		printf("%c %c", g->l, tipojogada);
 		for (int i = 0; i < tamanhopulos; i++) {
-			printf("%d\n", pulos[i]);
+			printf("%d", pulos[i]);
 		}
+		printf("\n");
+		free (pulos);
 
 }
 
@@ -457,7 +459,7 @@ int minmax_recursivo(vertice v){
 	int menor;
 	no n_lista = primeiro_no(v->vizinhos);
 	aux = conteudo(n_lista);
-	if (aux->nivel % 2 ==0) {//par é max
+	if (aux->nivel % 2 ==0) {//par é min
 		menor = minmax_recursivo(aux);
 
 		for (n_lista = proximo_no(n_lista); n_lista; n_lista=proximo_no(n_lista)) {
@@ -516,14 +518,14 @@ int analisa_jogada (char *jogada, int k, char l){
 				}
 			}
 			else if (i < meio){ // bola no lado esquerdo (ignorando bola no meio)	432101234  meio = 4
-				contpeso = meio - i;
+				contpeso = meio - i; // 3
 				ultima_jogada = ' ';
 				for (j = i + 1; j < meio; j++){
 					if (j == 'f'){
-						contpeso += meio - j;
+						contpeso += meio - j; // 5
 						ultima_jogada = 'f';
 					}
-					if (j == '.'){
+					else if (j == '.'){
 						if (ultima_jogada == '.'){
 							break;
 						}
@@ -547,7 +549,7 @@ int analisa_jogada (char *jogada, int k, char l){
 						contpeso += j - meio;
 						ultima_jogada = 'f';
 					}
-					if (j == '.'){
+					else if (j == '.'){
 						if (ultima_jogada == '.'){
 							break;
 						}
@@ -595,7 +597,6 @@ int analisa_jogada (char *jogada, int k, char l){
 
 	return soma;
 
-
 }
 
 int encontra_jogada(vertice v, int i){
@@ -630,13 +631,13 @@ void imprime_debug(char *c){
 // de vertices
 // devolve 1 em caso de sucesso ou
 //         0 caso contrário
-static int destroi_indice(void *p) {
-	if (!p)
-		return 0;
-	free(p);
-	p = NULL;
-	return 1;
-}
+// static int destroi_indice(void *p) {
+// 	if (!p)
+// 		return 0;
+// 	free(p);
+// 	p = NULL;
+// 	return 1;
+// }
 
 //------------------------------------------------------------------------------
 // Funcao auxiliar usada por destroi_grafo() para eliminar o conteudo de um vertice na lista
@@ -670,13 +671,13 @@ static int destroi_vertice(void *p) {
 // No caso não direcionado, é adicionado na lista do head que ele tambem aponta para o tail.
 // Os if's com existe_vertice() é para evitar que se existe duas arestas iguais
 // 		Não haver o mesmo vértice duplicado na lista de vizinhos.
-static int adiciona_vizinhanca (vertice In, vertice Out, grafo g){
-	if(!existe_vertice(In->vizinhos, Out))
-		insere_lista(Out, In->vizinhos);
-	if(!existe_vertice(Out->vizinhos, In))
-		insere_lista(In, Out->vizinhos);
-	return 1;
-}
+// static int adiciona_vizinhanca (vertice In, vertice Out, grafo g){
+// 	if(!existe_vertice(In->vizinhos, Out))
+// 		insere_lista(Out, In->vizinhos);
+// 	if(!existe_vertice(Out->vizinhos, In))
+// 		insere_lista(In, Out->vizinhos);
+// 	return 1;
+// }
 
 // void set_parametro(lista l, int parametro, int valor){ // parametro 0 => visitado.  1 => comunidade. 2 => indice.
 // 	vertice v;
@@ -732,6 +733,7 @@ int destroi_grafo(void *g) {
     }
     return 0;
 }
+
 // //------------------------------------------------------------------------------
 // // devolve um grafo igual a g
 

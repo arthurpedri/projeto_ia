@@ -33,7 +33,7 @@ void joga_lista (int cor, int indice, lista g, grafo graf);
 
 int indices_iguais(lista componentes);
 
-int analisa_jogada (char *c, int tam);
+
 
 
 
@@ -60,6 +60,10 @@ int h (lista componentes);
 
 lista h_simples (lista componentes, grafo g);
 
+grafo gera_grafo (int k, char l);
+int existe_chute(vertice v);
+int encontra_jogada(vertice v, int i);
+int analisa_jogada (char *jogada, int k, char l);
 void minmax(grafo g);
 int minmax_recursivo(vertice v);
 void popula_grafo (grafo g);
