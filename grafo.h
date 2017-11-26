@@ -3,7 +3,6 @@
 
 #include <stdlib.h>
 #include "lista.h"
-#include "mapa.h"
 
 //------------------------------------------------------------------------------
 // (apontador para) estrutura de dados para representar um grafo
@@ -59,15 +58,6 @@ int h (lista componentes);
 
 lista h_simples (lista componentes, grafo g);
 
-lista A_estrela (tmapa *m);
-
-lista A_estrela_simples (tmapa *m);
-
-void joga (int cor, int indice, grafo g);
-
-no menorfn (lista l);
-
-void copia_lista_cor(lista origem, lista destino);
 
 
 
@@ -122,7 +112,7 @@ char *nome_vertice(vertice v);
 // devolve o grafo lido ou
 //         NULL em caso de erro
 
-grafo le_grafo(tmapa *m);
+// grafo le_grafo(tmapa *m);
 
 //------------------------------------------------------------------------------
 // desaloca toda a memória usada em *g

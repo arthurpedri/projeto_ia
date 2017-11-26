@@ -2,30 +2,36 @@ Arthur Pedri Trevisol GRR20141784
 Arthur Carvalho de Queiroz GRR20141754
 
 ARQUIVOS:
-    main - Após a compilação, arquivo executável.
-    main.c - programa que recebe entrada e chama função principal de execução.
-    grafo.* -  todas as estruturas e funções referentes ao grafo, e funções de 
-                heurística/A*
-    lista.* - Funções e estruturas referentes as listas encadeadas usadas na
-                lista de adjacência do grafo.
-    Makefile - Makefile
-    leiame.txt - Este arquivo.
+  #main        - Após a compilação, arquivo executável.
+
+  main.c      - programa que recebe entrada e chama função principal de execução.
+                  grafo.* todas as estruturas e funções referentes ao grafo, e funções de
+                  heurística/A*
+
+  lista.*     - Funções e estruturas referentes as listas encadeadas usadas na
+                  lista de adjacência do grafo.
+
+  mapa.*      - Funções e estruturas autorizadas pelo Professor, que estavam no
+                  Arquivo: floodit_exemplo.c
+
+  Makefile    - Makefile
+
+  leiame.txt  - Este arquivo.
 
 Relatório
 
 Implementamos uma heurística que busca as cores mais distantes da raiz dado um mapa.
 Essa cor mais distante é, resumidamente, o componente de cor mais distante.
-Dentre todos os menores caminhos do componente da raiz e todos os componentes, 
+Dentre todos os menores caminhos do componente da raiz e todos os componentes,
 escolher o maior menor caminho.
 
-Nós implementamos um A*, que está no arquivo grafo.c função A_estrela(). 
+Nós implementamos um A*, que está no arquivo grafo.c função A_estrela().
 Entretanto esse algorítimo só roda em tempo hábil valores pequenos como 8x8 com 3 cores.
 
-Como não conseguimos otimizar o A* o suficiente para o desafio proposto, usamos 
+Como não conseguimos otimizar o A* o suficiente para o desafio proposto, usamos
 a nossa heurística para um algoritmo guloso, a partir da raiz o melhor caminho é
-escolhido e então é executado, a heurística só será executada novamente se ao final  
+escolhido e então é executado, a heurística só será executada novamente se ao final
 do primeiro caminho escolhido o jogo não estiver terminado.
 
 Na maioria dos casos que testamos o nosso programa encontrou soluções com menos
 etapas do que o h1 e o h2.
-
