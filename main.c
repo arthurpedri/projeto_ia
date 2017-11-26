@@ -10,7 +10,7 @@ int main(int argc, char **argv) {
   char l;
   scanf("%c %d", &l, &k);
   grafo g = gera_grafo(k, l);
-  while () {
+  while (1) {
     popula_grafo(g);
     // Avalia as jogadas com min max
     // retorna a melhor jogada;

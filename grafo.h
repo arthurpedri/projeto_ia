@@ -33,6 +33,8 @@ void joga_lista (int cor, int indice, lista g, grafo graf);
 
 int indices_iguais(lista componentes);
 
+int analisa_jogada (char *c, int tam);
+
 
 
 //------------------------------------------------------------------------------
@@ -57,6 +59,11 @@ lista cria_componentes(grafo g);
 int h (lista componentes);
 
 lista h_simples (lista componentes, grafo g);
+
+void minmax(grafo g);
+int minmax_recursivo(vertice v);
+void popula_grafo (grafo g);
+void popula (grafo g, vertice r_aux, int h);
 
 
 

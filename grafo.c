@@ -50,6 +50,20 @@ void copia_vetor_int (int *dest, int *src, int tam){
 	}
 }
 
+//------------------------------------------------------------------------------
+//Aloca memoria para um vertice v
+static vertice constroi_vertice(void) {
+	vertice v = malloc(sizeof(struct vertice));
+	if (!v)
+		return NULL;
+	v->nivel = 0;
+	v->valor = 0;
+	v->k = 0;
+	v->gol = 0;
+	v->vizinhos = constroi_lista();
+	return v;
+}
+
 void popula_grafo (grafo g){
 	vertice r_aux = g->raiz;
 	vertice v;
@@ -101,7 +115,7 @@ void popula_grafo (grafo g){
 				ultima_jogada = '.';
 			}
 			indice++;
-			
+
 		}
 		if (pode_continuar && ultima_jogada == 'f'){
 			// gerar jogada de gol
@@ -124,9 +138,9 @@ void popula_grafo (grafo g){
 			insere_lista(v, g->vertices);
 			popula(g, v, ALT_MAX); //vertice, altura máxima
 		}
-		
+
 		indice = bolapos;
-		
+
 		// verificar esquerda da bola
 		ultima_jogada = ' ';
 		pode_continuar = 1;
@@ -163,7 +177,7 @@ void popula_grafo (grafo g){
 				ultima_jogada = '.';
 			}
 			indice--;
-			
+
 		}
 		if (pode_continuar && ultima_jogada == 'f'){
 			// gerar jogada de gol
@@ -186,11 +200,11 @@ void popula_grafo (grafo g){
 			insere_lista(v, g->vertices);
 			popula(g, v, ALT_MAX); //vertice, altura máxima
 		}
-			
-	
+
+
 	}
-	
-	
+
+
 	int i = 0;
 	i = encontra_jogada(r_aux, i); // Procura a partir de i um '.' e devolve a posição dele
 	while(i != -1){
@@ -239,6 +253,7 @@ void popula (grafo g, vertice r_aux, int h){
 	int *puloslocal;
 	puloslocal = malloc(sizeof(int)*g->k);
 	int numpulos = 0;
+	vertice v;
 	if (existe_chute(r_aux)) {
 		// Gera jogadas de chute
 		int bolapos;
@@ -284,7 +299,7 @@ void popula (grafo g, vertice r_aux, int h){
 				ultima_jogada = '.';
 			}
 			indice++;
-			
+
 		}
 		if (pode_continuar && ultima_jogada == 'f'){
 			// gerar jogada de gol
@@ -307,9 +322,9 @@ void popula (grafo g, vertice r_aux, int h){
 			insere_lista(v, g->vertices);
 			popula(g, v, ALT_MAX); //vertice, altura máxima
 		}
-		
+
 		indice = bolapos;
-		
+
 		// verificar esquerda da bola
 		ultima_jogada = ' ';
 		pode_continuar = 1;
@@ -346,7 +361,7 @@ void popula (grafo g, vertice r_aux, int h){
 				ultima_jogada = '.';
 			}
 			indice--;
-			
+
 		}
 		if (pode_continuar && ultima_jogada == 'f'){
 			// gerar jogada de gol
@@ -371,10 +386,9 @@ void popula (grafo g, vertice r_aux, int h){
 		}
 
 	}
-	
-	
+
+
 	int i = 0;
-	vertice v;
 	i = encontra_jogada(r_aux, i); // Procura a partir de i um '.' e devolve a posição dele
 	while(i != -1){
 		v = constroi_vertice();
@@ -397,11 +411,79 @@ void popula (grafo g, vertice r_aux, int h){
 }
 
 void minmax(grafo g){
-	
+	vertice v = g->raiz;
+	vertice aux;
+	int *pulos;
+	pulos = malloc(sizeof(int)*g->k);
+	char tipojogada;
+	int tamanhopulos;
+	int maior;
+
+	no n_lista = primeiro_no(v->vizinhos);
+	aux = conteudo(n_lista);
+	maior = minmax_recursivo(aux);
+
+	copia_vetor_int(pulos, aux->pulos, aux->tamanhopulos);
+	tamanhopulos = aux->tamanhopulos;
+	tipojogada = aux->tipojogada;
+
+	for (n_lista = proximo_no(n_lista); n_lista; n_lista=proximo_no(n_lista)) {
+	 	aux = conteudo(n_lista);
+		int aux2 = minmax_recursivo(aux);
+		if (aux2 > maior) {
+			maior = aux2;
+			copia_vetor_int(pulos, aux->pulos, aux->tamanhopulos);
+			tamanhopulos = aux->tamanhopulos;
+			tipojogada = aux->tipojogada;
+		}
+	}
+
+
+		printf("%c %c", g->l, tipojogada);
+		for (int i = 0; i < tamanhopulos; i++) {
+			printf("%d\n", pulos[i]);
+		}
+
 }
 
-void analisa_jogada (char *c, int tam){
-	
+int minmax_recursivo(vertice v){
+	if (v->nivel == ALT_MAX) {
+		return v->valor;
+	}
+
+	vertice aux;
+
+	int maior;
+	int menor;
+	no n_lista = primeiro_no(v->vizinhos);
+	aux = conteudo(n_lista);
+	if (aux->nivel % 2 ==0) {//par é max
+		menor = minmax_recursivo(aux);
+
+		for (n_lista = proximo_no(n_lista); n_lista; n_lista=proximo_no(n_lista)) {
+		 	aux = conteudo(n_lista);
+			int aux2 = minmax_recursivo(aux);
+			if (aux2 < menor) {
+				menor = aux2;
+			}
+		}
+		return menor;
+	}
+	else{
+		maior = minmax_recursivo(aux);
+		for (n_lista = proximo_no(n_lista); n_lista; n_lista=proximo_no(n_lista)) {
+		 	aux = conteudo(n_lista);
+			int aux2 = minmax_recursivo(aux);
+			if (aux2 > maior) {
+				maior = aux2;
+			}
+		}
+		return maior;
+	}
+}
+
+int analisa_jogada (char *c, int tam){
+
 }
 
 int encontra_jogada(vertice v, int i){
@@ -429,44 +511,6 @@ void imprime_debug(char *c){
 	#endif
 }
 
-//------------------------------------------------------------------------------
-//Aloca memoria para um vertice v
-static vertice constroi_vertice(void) {
-	vertice v = malloc(sizeof(struct vertice));
-	if (!v)
-		return NULL;
-	v->nivel = 0;
-	v->valor = 0;
-	v->k = 0;
-	v->vizinhos = constroi_lista();
-	return v;
-}
-
-
-//------------------------------------------------------------------------------
-// Busca um vertice v na lista dada
-static vertice busca_vertice(lista l, vertice v){
-	vertice novo;
-	for (no n_lista = primeiro_no(l); n_lista; n_lista=proximo_no(n_lista)) {
-	 	novo =  conteudo(n_lista);
-		if (v->l == novo->l && v->c == novo->c)
-			return novo;
-	 }
-	 return NULL;
-}
-
-//------------------------------------------------------------------------------
-// Verifica se vertice esta na lista l
-static int existe_vertice(lista l, vertice v){
-	vertice novo;
-	for (no n_lista = primeiro_no(l); n_lista; n_lista=proximo_no(n_lista)) {
-	 	novo =  conteudo(n_lista);
-		if (v->l == novo->l && v->c == novo->c)
-			return 1;
-	 }
-	 return 0;
-}
-
 
 
 //------------------------------------------------------------------------------
@@ -491,9 +535,12 @@ static int destroi_vertice(void *p) {
 	vertice v = p;
     if (v) {
 		no n;
-		if ((destroi_lista(v->vizinhos, NULL) && (destroi_lista(v->passos, NULL)))){
+		if (destroi_lista(v->vizinhos, NULL)){
 			v->vizinhos = NULL;
-			v->passos = NULL;
+			free(v->jogada);
+			if (v->pulos != NULL) {
+				free(v->pulos);
+			}
 			free (v);
 			v = NULL;
 			return 1;
@@ -539,18 +586,6 @@ static int adiciona_vizinhanca (vertice In, vertice Out, grafo g){
 // 		}
 // 	}
 // }
-
-
-int existe_vizinhanca (vertice original, int indice){
-	no aux2;
-	vertice v_aux2;
-	for (aux2 = primeiro_no(original->vizinhos); aux2; aux2 = proximo_no(aux2)) {
-		v_aux2 = conteudo(aux2);
-		if (v_aux2->indice == indice)
-			return 1;
-	}
-	return 0;
-}
 
 grafo gera_grafo (int k, char l){
   grafo g = malloc(sizeof(struct grafo));
