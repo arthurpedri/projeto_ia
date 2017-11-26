@@ -67,7 +67,7 @@ int existe_chute(vertice v){
 			break;
 		}
 	}
-	if (i == 0 || i == v->k - 1) {
+	if ((i == 0 && v->jogada[1] == 'f') || (i == v->k - 1 && v->jogada[v->k - 2] == 'f')) {
 		return 1;
 	}else{
 		if (v->jogada[i + 1] == 'f' || v->jogada[i - 1] == 'f') {
@@ -257,6 +257,7 @@ grafo gera_grafo (int k, char l){
 	if (!g)
 		return NULL;
 	g->k = k;
+	g->l = l;
 	g->vertices = constroi_lista();
 	vertice v = constroi_vertice();
 	v->jogada = malloc(sizeof(char)*k);

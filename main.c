@@ -8,7 +8,7 @@ int main(int argc, char **argv) {
   char turno;
   int k; // Tamanho do jogo;
   char l;
-  scanf("%c %d", &c, &k);
+  scanf("%c %d", &l, &k);
   grafo g = gera_grafo(k, l);
   while () {
     popula_grafo(g);

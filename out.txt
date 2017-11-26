@@ -42,7 +42,7 @@ ações:
 
 O movimento da bola acontece em  saltos sobre sequências de um ou mais
 filósofos  adjacentes.  Para saltar  a  bola  sobre uma  sequência  de
-filósofos a  bola precisa estar  em uma  posição do campo  adjacente �
+filósofos a  bola precisa estar  em uma  posição do campo  adjacente �
 sequência.
 
 Considere por  exemplo a  seguinte configuração de  um campo  em algum
@@ -80,7 +80,7 @@ vez é o da direita e que a configuração do campo é dada por:
   ffffffoff.f.fff..f.
 
 Nesta configuração, o jogador da direita pode marcar um gol saltando a
-bola sobre  a sequência  de 6  filósofos que está  logo �   esquerda da
+bola sobre  a sequência  de 6  filósofos que está  logo �   esquerda da
 bola, fazendo com  que a bola saia do campo  pelo extremo esquerdo. Ao
 marcar o gol o jogador da direita vence e a partida é encerrada.
 
