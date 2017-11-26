@@ -3,12 +3,18 @@
 #include <string.h>
 #include "grafo.h"
 
+#define ALT_MAX 3
+
 struct vertice
 {
 	char *jogada;
 	int nivel;
 	int valor;
 	int k;
+	int *pulos;
+	char tipojogada;
+	int tamanhopulos;
+	int gol;
 	lista vizinhos;
 };
 
@@ -37,25 +43,172 @@ unsigned int n_vertices(grafo g){
 // 	}
 // }
 
+void copia_vetor_int (int *dest, int *src, int tam){
+	int i;
+	for (i = 0; i < tam; i++){
+		dest[i] = src[i];
+	}
+}
+
 void popula_grafo (grafo g){
 	vertice r_aux = g->raiz;
+	vertice v;
+	int *puloslocal;
+	puloslocal = malloc(sizeof(int)*g->k);
+	int numpulos = 0;
 	if (existe_chute(r_aux)) {
 		// Gera jogadas de chute
+		int bolapos;
+		for (bolapos = 0; bolapos < r_aux->k; bolapos++) {
+			if (r_aux->jogada[bolapos] == 'o') {
+				break;
+			}
+		}
+		int indice = bolapos; // verifica posicoes direita
+		// verificar direita da bola
+		char ultima_jogada = ' ';
+		int pode_continuar = 1;
+		while ((indice != r_aux->k - 1) && (pode_continuar)){
+			if (r_aux->jogada[indice + 1] == 'f'){
+				// da pra procurar mais
+				ultima_jogada = 'f';
+			}
+			else if (r_aux->jogada[indice + 1] == '.'){
+				if (ultima_jogada != '.'){
+					// gerar jogada
+					v = constroi_vertice();
+					v->jogada = malloc(sizeof(char)*g->k);
+					v->pulos = malloc(sizeof(char)*g->k);
+					v->tipojogada = 'o';
+					strcpy(v->jogada, r_aux->jogada);
+					puloslocal[numpulos] = indice + 1;
+					numpulos++;
+					v->tamanhopulos = numpulos; // pulos tem que começar em 1
+					copia_vetor_int(v->pulos, puloslocal, g->k);
+					int limpador;
+					for (limpador = bolapos; limpador < indice; limpador++)
+						v->jogada[limpador] = '.'; // limpar a posição
+					v->jogada[limpador] = 'o';
+					v->k = g->k;
+					v->nivel = 2;
+					insere_lista (v, r_aux->vizinhos);
+					insere_lista(v, g->vertices);
+					popula(g, v, ALT_MAX); //vertice, altura máxima
+				}
+				else{
+					pode_continuar = 0;
+				}
+				ultima_jogada = '.';
+			}
+			indice++;
+			
+		}
+		if (pode_continuar && ultima_jogada == 'f'){
+			// gerar jogada de gol
+			v = constroi_vertice();
+			v->jogada = malloc(sizeof(char)*g->k);
+			v->pulos = malloc(sizeof(char)*g->k);
+			v->tipojogada = 'o';
+			v->gol = 1;
+			puloslocal[numpulos] = g->k + 1;
+			numpulos++;
+			v->tamanhopulos = numpulos; // pulos tem que começar em 1
+			copia_vetor_int(v->pulos, puloslocal, g->k);
+			strcpy(v->jogada, r_aux->jogada);
+			int limpador;
+			for (limpador = bolapos; limpador <= indice; limpador++)
+				v->jogada[limpador] = '.'; // limpar a posição
+			v->k = g->k;
+			v->nivel = 2;
+			insere_lista (v, r_aux->vizinhos);
+			insere_lista(v, g->vertices);
+			popula(g, v, ALT_MAX); //vertice, altura máxima
+		}
+		
+		indice = bolapos;
+		
+		// verificar esquerda da bola
+		ultima_jogada = ' ';
+		pode_continuar = 1;
+		while ((indice != 0) && (pode_continuar)){
+			if (r_aux->jogada[indice - 1] == 'f'){
+				// da pra procurar mais
+				ultima_jogada = 'f';
+			}
+			else if (r_aux->jogada[indice - 1] == '.'){
+				if (ultima_jogada != '.'){
+					// gerar jogada
+					v = constroi_vertice();
+					v->jogada = malloc(sizeof(char)*g->k);
+					v->pulos = malloc(sizeof(char)*g->k);
+					v->tipojogada = 'o';
+					puloslocal[numpulos] = indice + 1;
+					numpulos++;
+					v->tamanhopulos = numpulos; // pulos tem que começar em 1
+					copia_vetor_int(v->pulos, puloslocal, g->k);
+					strcpy(v->jogada, r_aux->jogada);
+					int limpador;
+					for (limpador = bolapos; limpador > indice; limpador--)
+						v->jogada[limpador] = '.'; // limpar a posição
+					v->jogada[limpador] = 'o';
+					v->k = g->k;
+					v->nivel = 2;
+					insere_lista (v, r_aux->vizinhos);
+					insere_lista(v, g->vertices);
+					popula(g, v, ALT_MAX); //vertice, altura máxima
+				}
+				else{
+					pode_continuar = 0;
+				}
+				ultima_jogada = '.';
+			}
+			indice--;
+			
+		}
+		if (pode_continuar && ultima_jogada == 'f'){
+			// gerar jogada de gol
+			v = constroi_vertice();
+			v->jogada = malloc(sizeof(char)*g->k);
+			v->pulos = malloc(sizeof(char)*g->k);
+			v->tipojogada = 'o';
+			puloslocal[numpulos] = 0;
+			numpulos++;
+			v->tamanhopulos = numpulos; // pulos tem que começar em 1
+			copia_vetor_int(v->pulos, puloslocal, g->k);
+			v->gol = 1;
+			strcpy(v->jogada, r_aux->jogada);
+			int limpador;
+			for (limpador = bolapos; limpador >= indice; limpador--)
+				v->jogada[limpador] = '.'; // limpar a posição
+			v->k = g->k;
+			v->nivel = 2;
+			insere_lista (v, r_aux->vizinhos);
+			insere_lista(v, g->vertices);
+			popula(g, v, ALT_MAX); //vertice, altura máxima
+		}
+			
+	
 	}
+	
+	
 	int i = 0;
-	vertice v;
+	i = encontra_jogada(r_aux, i); // Procura a partir de i um '.' e devolve a posição dele
 	while(i != -1){
-		i = encontra_jogada(r_aux, i); // Procura a partir de i um '.' e devolve a posição dele
 		v = constroi_vertice();
 		v->jogada = malloc(sizeof(char)*g->k);
+		v->pulos = malloc(sizeof(char)*g->k);
+		v->tamanhopulos = 1; // pulos tem que começar em 1
+		v->pulos[0] = i + 1;
 		strcpy(v->jogada, r_aux->jogada);
+		v->tipojogada = 'f';
 		v->jogada[i] = 'f'; //Coloca o jogador já na posição
 		v->k = g->k;
 		v->nivel = 2;
 		insere_lista (v, r_aux->vizinhos);
 		insere_lista(v, g->vertices);
 		i++;
-		popula(g, v, 3); //vertice, altura máxima
+		popula(g, v, ALT_MAX); //vertice, altura máxima
+		i = encontra_jogada(r_aux, i); // Procura a partir de i um '.' e devolve a posição dele
 	}
 
 }
@@ -78,30 +231,177 @@ int existe_chute(vertice v){
 	}
 }
 
-void popula (grafo g, vertice v, int h){
-	if (v->nivel == h) { // testa se está na última altura desejada
-		v->valor = analisa_jogada(v->jogada, v->k);
+void popula (grafo g, vertice r_aux, int h){
+	if (r_aux->nivel == h) { // testa se está na última altura desejada
+		r_aux->valor = analisa_jogada(r_aux->jogada, r_aux->k);
 		return;
 	}
-	if (existe_chute(v)) {
+	int *puloslocal;
+	puloslocal = malloc(sizeof(int)*g->k);
+	int numpulos = 0;
+	if (existe_chute(r_aux)) {
 		// Gera jogadas de chute
+		int bolapos;
+		for (bolapos = 0; bolapos < r_aux->k; bolapos++) {
+			if (r_aux->jogada[bolapos] == 'o') {
+				break;
+			}
+		}
+		int indice = bolapos; // verifica posicoes direita
+		// verificar direita da bola
+		char ultima_jogada = ' ';
+		int pode_continuar = 1;
+		while ((indice != r_aux->k - 1) && (pode_continuar)){
+			if (r_aux->jogada[indice + 1] == 'f'){
+				// da pra procurar mais
+				ultima_jogada = 'f';
+			}
+			else if (r_aux->jogada[indice + 1] == '.'){
+				if (ultima_jogada != '.'){
+					// gerar jogada
+					v = constroi_vertice();
+					v->jogada = malloc(sizeof(char)*g->k);
+					v->pulos = malloc(sizeof(char)*g->k);
+					v->tipojogada = 'o';
+					strcpy(v->jogada, r_aux->jogada);
+					puloslocal[numpulos] = indice + 1;
+					numpulos++;
+					v->tamanhopulos = numpulos; // pulos tem que começar em 1
+					copia_vetor_int(v->pulos, puloslocal, g->k);
+					int limpador;
+					for (limpador = bolapos; limpador < indice; limpador++)
+						v->jogada[limpador] = '.'; // limpar a posição
+					v->jogada[limpador] = 'o';
+					v->k = g->k;
+					v->nivel = r_aux->nivel + 1;
+					insere_lista (v, r_aux->vizinhos);
+					insere_lista(v, g->vertices);
+					popula(g, v, ALT_MAX); //vertice, altura máxima
+				}
+				else{
+					pode_continuar = 0;
+				}
+				ultima_jogada = '.';
+			}
+			indice++;
+			
+		}
+		if (pode_continuar && ultima_jogada == 'f'){
+			// gerar jogada de gol
+			v = constroi_vertice();
+			v->jogada = malloc(sizeof(char)*g->k);
+			v->pulos = malloc(sizeof(char)*g->k);
+			v->tipojogada = 'o';
+			v->gol = 1;
+			puloslocal[numpulos] = g->k + 1;
+			numpulos++;
+			v->tamanhopulos = numpulos; // pulos tem que começar em 1
+			copia_vetor_int(v->pulos, puloslocal, g->k);
+			strcpy(v->jogada, r_aux->jogada);
+			int limpador;
+			for (limpador = bolapos; limpador <= indice; limpador++)
+				v->jogada[limpador] = '.'; // limpar a posição
+			v->k = g->k;
+			v->nivel = r_aux->nivel + 1;
+			insere_lista (v, r_aux->vizinhos);
+			insere_lista(v, g->vertices);
+			popula(g, v, ALT_MAX); //vertice, altura máxima
+		}
+		
+		indice = bolapos;
+		
+		// verificar esquerda da bola
+		ultima_jogada = ' ';
+		pode_continuar = 1;
+		while ((indice != 0) && (pode_continuar)){
+			if (r_aux->jogada[indice - 1] == 'f'){
+				// da pra procurar mais
+				ultima_jogada = 'f';
+			}
+			else if (r_aux->jogada[indice - 1] == '.'){
+				if (ultima_jogada != '.'){
+					// gerar jogada
+					v = constroi_vertice();
+					v->jogada = malloc(sizeof(char)*g->k);
+					v->pulos = malloc(sizeof(char)*g->k);
+					v->tipojogada = 'o';
+					puloslocal[numpulos] = indice + 1;
+					numpulos++;
+					v->tamanhopulos = numpulos; // pulos tem que começar em 1
+					copia_vetor_int(v->pulos, puloslocal, g->k);
+					strcpy(v->jogada, r_aux->jogada);
+					int limpador;
+					for (limpador = bolapos; limpador > indice; limpador--)
+						v->jogada[limpador] = '.'; // limpar a posição
+					v->jogada[limpador] = 'o';
+					v->k = g->k;
+					v->nivel = r_aux->nivel + 1;
+					insere_lista (v, r_aux->vizinhos);
+					insere_lista(v, g->vertices);
+					popula(g, v, ALT_MAX); //vertice, altura máxima
+				}
+				else{
+					pode_continuar = 0;
+				}
+				ultima_jogada = '.';
+			}
+			indice--;
+			
+		}
+		if (pode_continuar && ultima_jogada == 'f'){
+			// gerar jogada de gol
+			v = constroi_vertice();
+			v->jogada = malloc(sizeof(char)*g->k);
+			v->pulos = malloc(sizeof(char)*g->k);
+			v->tipojogada = 'o';
+			puloslocal[numpulos] = 0;
+			numpulos++;
+			v->tamanhopulos = numpulos; // pulos tem que começar em 1
+			copia_vetor_int(v->pulos, puloslocal, g->k);
+			v->gol = 1;
+			strcpy(v->jogada, r_aux->jogada);
+			int limpador;
+			for (limpador = bolapos; limpador >= indice; limpador--)
+				v->jogada[limpador] = '.'; // limpar a posição
+			v->k = g->k;
+			v->nivel = r_aux->nivel + 1;
+			insere_lista (v, r_aux->vizinhos);
+			insere_lista(v, g->vertices);
+			popula(g, v, ALT_MAX); //vertice, altura máxima
+		}
+
 	}
+	
+	
 	int i = 0;
-	vertice aux;
+	vertice v;
+	i = encontra_jogada(r_aux, i); // Procura a partir de i um '.' e devolve a posição dele
 	while(i != -1){
-		i = encontra_jogada(v, i); // Procura a partir de i um '.' e devolve a posição dele
-		aux = constroi_vertice();
-		aux->jogada = malloc(sizeof(char)*g->k);
-		strcpy(aux->jogada, v->jogada);
-		aux->jogada[i] = 'f'; //Coloca o jogador já na posição
-		aux->k = g->k;
-		aux->nivel = v->nivel + 1;
-		insere_lista (aux, r_aux->vizinhos);
-		insere_lista(aux, g->vertices);
+		v = constroi_vertice();
+		v->jogada = malloc(sizeof(char)*g->k);
+		strcpy(v->jogada, r_aux->jogada);
+		v->pulos = malloc(sizeof(char)*g->k);
+		v->tamanhopulos = 1; // pulos tem que começar em 1
+		v->pulos[0] = i + 1;
+		v->tipojogada = 'f';
+		v->jogada[i] = 'f'; //Coloca o jogador já na posição
+		v->k = g->k;
+		v->nivel = r_aux->nivel + 1;
+		insere_lista (v, r_aux->vizinhos);
+		insere_lista(v, g->vertices);
 		i++;
-		popula(g, aux, 3); //vertice, altura máxima
+		popula(g, v, ALT_MAX); //vertice, altura máxima
+		i = encontra_jogada(r_aux, i); // Procura a partir de i um '.' e devolve a posição dele
 	}
 	return;
+}
+
+void minmax(grafo g){
+	
+}
+
+void analisa_jogada (char *c, int tam){
+	
 }
 
 int encontra_jogada(vertice v, int i){
@@ -261,7 +561,7 @@ grafo gera_grafo (int k, char l){
 	g->vertices = constroi_lista();
 	vertice v = constroi_vertice();
 	v->jogada = malloc(sizeof(char)*k);
-  scanf("%s", v->jogada);
+	scanf("%s", v->jogada);
 	v->k = k;
 	v->nivel = 1;
 	g->raiz = v;
