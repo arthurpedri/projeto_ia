@@ -232,8 +232,8 @@ int existe_chute(vertice v){
 }
 
 void popula (grafo g, vertice r_aux, int h){
-	if (r_aux->nivel == h) { // testa se está na última altura desejada
-		r_aux->valor = analisa_jogada(r_aux->jogada, r_aux->k);
+	if (r_aux->nivel == h && r_aux->gol == 0) { // testa se está na última altura desejada
+		r_aux->valor = analisa_jogada(r_aux->jogada, r_aux->k, g->l);
 		return;
 	}
 	int *puloslocal;
@@ -400,7 +400,119 @@ void minmax(grafo g){
 	
 }
 
-void analisa_jogada (char *c, int tam){
+
+
+int analisa_jogada (char *jogada, int k, char l){
+	int bolapos;
+	int meio = (k-1)/2;
+	for (bolapos = 0; bolapos < k; bolapos++) { // achar posicao da bola
+		if (jogada[bolapos] == 'o') {
+			break;
+		}
+	}
+	int *jogadapesos = calloc(k, sizeof(int));
+	int i, j;
+
+	int contpeso = 0;
+	char ultima_jogada = ' ';
+	for (i=0; i < k; i++){ // percorre vetor de jogadas
+		if (i==bolapos){ // i é bola
+			if (i == 0){ // bola do lado do gol (multiplicadores sao invertidos)
+				if (l == 'e'){ // nosso lado é esquerdo
+					jogadapesos[i] = k*k;
+				}
+				else {
+					jogadapesos[i] = (-1)*(k*k);
+				}
+			}
+			else if (i == k-1){ // bola do lado do gol (multiplicadores sao invertidos)
+				if (l == 'd'){
+					jogadapesos[i] = k*k;
+				}
+				else {
+					jogadapesos[i] = (-1)*(k*k);
+				}
+			}
+			else if (i < meio){ // bola no lado esquerdo (ignorando bola no meio)	432101234  meio = 4
+				contpeso = meio - i;
+				ultima_jogada = ' ';
+				for (j = i + 1; j < meio; j++){
+					if (j == 'f'){
+						contpeso += meio - j;
+						ultima_jogada = 'f';
+					}
+					if (j == '.'){
+						if (ultima_jogada == '.'){
+							break;
+						}
+						else if (ultima_jogada != '.'){
+							ultima_jogada = '.';
+						}
+					}
+				}
+				if (l == 'd'){
+					jogadapesos[i] = contpeso;
+				}
+				else {
+					jogadapesos[i] = (-1)*(contpeso);
+				}
+			}
+			else if (i > meio){ // bola no lado direito (ignorando bola no meio)
+				contpeso = i - meio;
+				ultima_jogada = ' ';
+				for (j = i - 1; j > meio; j--){
+					if (j == 'f'){
+						contpeso += j - meio;
+						ultima_jogada = 'f';
+					}
+					if (j == '.'){
+						if (ultima_jogada == '.'){
+							break;
+						}
+						else if (ultima_jogada != '.'){
+							ultima_jogada = '.';
+						}
+					}
+				}
+				if (l == 'e'){
+					jogadapesos[i] = contpeso;
+				}
+				else {
+					jogadapesos[i] = (-1)*(contpeso);
+				}
+			}
+		}
+		else {
+			// i nao é bola
+			if (jogada[i] == 'f' && jogadapesos[i] == 0){ // posicao e jogador e nao esta relacionado com a bola
+				if (i < meio){
+					if (l == 'd'){
+						jogadapesos[i] = meio - i;
+					}
+					else {
+						jogadapesos[i] = (-1)*(meio - i);
+					}
+				}
+				else if (i > meio){
+					if (l == 'e'){
+						jogadapesos[i] = i - meio;
+					}
+					else {
+						jogadapesos[i] = (-1)*(i - meio);
+					}
+				}
+			}
+		}
+	}
+	
+	int soma = 0;
+	for (i = 0; i < k; i++)
+		soma += jogadapesos[i];
+	
+	free(jogadapesos);
+	
+	return soma;
+	
 	
 }
 
