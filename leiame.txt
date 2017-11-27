@@ -6,32 +6,52 @@ ARQUIVOS:
 
   main.c      - programa que recebe entrada e chama função principal de execução.
                   grafo.* todas as estruturas e funções referentes ao grafo, e funções de
-                  heurística/A*
+                  heurística/minimax
 
   lista.*     - Funções e estruturas referentes as listas encadeadas usadas na
                   lista de adjacência do grafo.
 
-  mapa.*      - Funções e estruturas autorizadas pelo Professor, que estavam no
-                  Arquivo: floodit_exemplo.c
-
+  grafo.*     - Funções e estruturas que implementam toda a funcionalidade do trabalho
+                  
   Makefile    - Makefile
 
   leiame.txt  - Este arquivo.
 
 Relatório
 
-Implementamos uma heurística que busca as cores mais distantes da raiz dado um mapa.
-Essa cor mais distante é, resumidamente, o componente de cor mais distante.
-Dentre todos os menores caminhos do componente da raiz e todos os componentes,
-escolher o maior menor caminho.
+Implementamos um algoritmo minimax que escolhe as melhores e piores jogadas com base
+em um sistema de pontuação que criamos que depende da posição da bola no campo. Ela
+basicamente funciona definindo valores para cada posição no campo, onde valores mais
+próximos do meio de campo valem menos. Jogadores entre a bola e o gol adversário são pontos
+positivos e jogadores entre a bola e o nosso gol são pontos negativos. A bola também 
+tem uma pontuação que é uma soma de todas os valores desde o meio de campo até ela.
+A bola tem pontuação negativa se está no nosso lado do campo e positiva se está no campo adversário,
+a única exceção a essa regra é quando a bola está diretamente ao lado do gol, que neste caso
+os multiplicadores invertem, ou seja, ter a bola ao lado do gol adversário é muito ruim
+pois torna impossível fazer um gol. Abaixo está um exemplo.
 
-Nós implementamos um A*, que está no arquivo grafo.c função A_estrela().
-Entretanto esse algorítimo só roda em tempo hábil valores pequenos como 8x8 com 3 cores.
+Decidimos limitar a profundidade do minimax para 4.
 
-Como não conseguimos otimizar o A* o suficiente para o desafio proposto, usamos
-a nossa heurística para um algoritmo guloso, a partir da raiz o melhor caminho é
-escolhido e então é executado, a heurística só será executada novamente se ao final
-do primeiro caminho escolhido o jogo não estiver terminado.
+Exemplo da pontuação:
 
-Na maioria dos casos que testamos o nosso programa encontrou soluções com menos
-etapas do que o h1 e o h2.
+        e 7 ...o...
+        A posição central tem valor 0 e não existem jogadores, o valor do mapa é 0.
+        
+        e 7 ...o..f
+        Aqui temos um jogador do lado do gol adversário, que no início do jogo é a 
+        melhor jogada, e tem valor do mapa 3.
+        
+        e 7 ....fo.
+        Aqui a bola vai ter valor 3, mas como o jogador está entre a bola e o nosso gol
+        ele vai ter peso negativo, e o valor do mapa é 2.
+        
+        e 7 o......
+        Nesse caso a bola vai estar do lado do nosso gol, uma posição boa, e o valor
+        do mapa recebe um valor especial de 7*7 (k*k).
+        
+        e 7 ...of.f
+        Nesse caso temos um gol para o jogador, e o mapa vai receber um valor especial
+        de (7*7*2)-(2), a fórmula do valor do gol é (k*k*2)-(nível do nó). 
+        Nível do nó nesse caso será 2 porque ele é filho da raiz. Usamos o nível
+        do nó para selecionar as jogadas que tem gol mais iminente.
+        

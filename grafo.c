@@ -145,6 +145,9 @@ void popula_grafo (grafo g){
 			insere_lista(v, g->vertices);
 		}
 
+		free(puloslocal);
+		puloslocal = malloc(sizeof(int)*g->k);
+		numpulos = 0;
 		indice = bolapos;
 
 		// verificar esquerda da bola
@@ -221,7 +224,7 @@ void popula_grafo (grafo g){
 	//imprime_debug("entrei popula_grafo\n");
 		v = constroi_vertice();
 		v->jogada = malloc(sizeof(char)*g->k);
-		v->pulos = malloc(sizeof(int)*g->k);
+		v->pulos = malloc(sizeof(int));
 		v->tamanhopulos = 1; // pulos tem que começar em 1
 		//printf("i+1 %d", i+1);
 		v->pulos[0] = i + 1;
@@ -421,7 +424,7 @@ void popula (grafo g, vertice r_aux, int h){
 		v = constroi_vertice();
 		v->jogada = malloc(sizeof(char)*g->k);
 		strcpy(v->jogada, r_aux->jogada);
-		v->pulos = malloc(sizeof(int)*g->k);
+		v->pulos = malloc(sizeof(int));
 		v->tamanhopulos = 1; // pulos tem que começar em 1
 		v->pulos[0] = i + 1;
 		v->tipojogada = 'f';
@@ -479,7 +482,10 @@ void minmax(grafo g){
 				copia_vetor_int(pulos, aux->pulos, aux->tamanhopulos);
 				tamanhopulos = aux->tamanhopulos;
 				tipojogada = aux->tipojogada;
-			}	
+			}
+			else {
+				free(aux->pulos);
+			}
 		} 
 		else {
 			if (aux2 >= maior) {
@@ -492,6 +498,9 @@ void minmax(grafo g){
 				//imprime_debug(" ");
 				tamanhopulos = aux->tamanhopulos;
 				tipojogada = aux->tipojogada;
+			}
+			else {
+				free(aux->pulos);
 			}
 		}
 		
@@ -530,11 +539,13 @@ int minmax_recursivo(vertice v, char l){
 			if (l == 'd'){
 				if (aux2 < menor) 
 					menor = aux2;
+				
 			}
 			else {
 				if (aux2 <= menor) 
 					menor = aux2;
 			}
+			free(aux->pulos);
 		}
 		return menor;
 	}
@@ -567,7 +578,8 @@ int analisa_jogada (char *jogada, int k, char l){
 			break;
 		}
 	}
-	int *jogadapesos = calloc(k, sizeof(int));
+	int *jogadapesos;
+	jogadapesos = calloc(k, sizeof(int));
 	int i, j;
 
 	int contpeso = 0;
@@ -725,9 +737,8 @@ static int destroi_vertice(void *p) {
 		if (destroi_lista(v->vizinhos, NULL)){
 			v->vizinhos = NULL;
 			free(v->jogada);
-			if (v->pulos != NULL) {
-				free(v->pulos);
-			}
+			
+			
 			free (v);
 			v = NULL;
 			return 1;
@@ -784,7 +795,10 @@ grafo gera_grafo (int k, char l){
 	g->vertices = constroi_lista();
 	vertice v = constroi_vertice();
 	v->jogada = malloc(sizeof(char)*k);
+	char a[100];
 	scanf("%s", v->jogada);
+	getchar();
+	fgets(a, 100, stdin);
 	//printf("%s", v->jogada);
 	v->k = k;
 	v->nivel = 1;

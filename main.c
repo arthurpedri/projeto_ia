@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
+#include <string.h>
 #include "grafo.h"
 
 
@@ -11,7 +12,6 @@ int main(int argc, char **argv) {
   scanf("%c %d", &l, &k);
   grafo g = gera_grafo(k, l);
   while (1) {
-    imprime_debug("MAIN\n");
     popula_grafo(g);
     // Avalia as jogadas com min max (retorna a melhor jogada)
     minmax(g);
@@ -19,7 +19,6 @@ int main(int argc, char **argv) {
     // destroi esses vértices
     destroi_grafo(g);
     // espera entrada
-    getchar();
     scanf("%c %d", &l, &k);
     g = gera_grafo(k, l);
   }
