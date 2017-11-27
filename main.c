@@ -11,6 +11,7 @@ int main(int argc, char **argv) {
   scanf("%c %d", &l, &k);
   grafo g = gera_grafo(k, l);
   while (1) {
+    imprime_debug("MAIN\n");
     popula_grafo(g);
     // Avalia as jogadas com min max (retorna a melhor jogada)
     minmax(g);
