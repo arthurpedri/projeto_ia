@@ -92,7 +92,7 @@ void popula_grafo (grafo g){
 					// gerar jogada
 					v = constroi_vertice();
 					v->jogada = malloc(sizeof(char)*g->k);
-					v->pulos = malloc(sizeof(char)*g->k);
+					v->pulos = malloc(sizeof(int)*g->k);
 					v->tipojogada = 'o';
 					strcpy(v->jogada, r_aux->jogada);
 					puloslocal[numpulos] = indice + 2;
@@ -121,7 +121,7 @@ void popula_grafo (grafo g){
 			// gerar jogada de gol
 			v = constroi_vertice();
 			v->jogada = malloc(sizeof(char)*g->k);
-			v->pulos = malloc(sizeof(char)*g->k);
+			v->pulos = malloc(sizeof(int)*g->k);
 			v->tipojogada = 'o';
 			v->gol = 1;
 			v->valor = v->k*v->k*2;
@@ -157,7 +157,7 @@ void popula_grafo (grafo g){
 					// gerar jogada
 					v = constroi_vertice();
 					v->jogada = malloc(sizeof(char)*g->k);
-					v->pulos = malloc(sizeof(char)*g->k);
+					v->pulos = malloc(sizeof(int)*g->k);
 					v->tipojogada = 'o';
 					puloslocal[numpulos] = indice;
 					numpulos++;
@@ -186,7 +186,7 @@ void popula_grafo (grafo g){
 			// gerar jogada de gol
 			v = constroi_vertice();
 			v->jogada = malloc(sizeof(char)*g->k);
-			v->pulos = malloc(sizeof(char)*g->k);
+			v->pulos = malloc(sizeof(int)*g->k);
 			v->tipojogada = 'o';
 			puloslocal[numpulos] = 0;
 			numpulos++;
@@ -217,7 +217,7 @@ void popula_grafo (grafo g){
 	while(i != -1){
 		v = constroi_vertice();
 		v->jogada = malloc(sizeof(char)*g->k);
-		v->pulos = malloc(sizeof(char)*g->k);
+		v->pulos = malloc(sizeof(int)*g->k);
 		v->tamanhopulos = 1; // pulos tem que começar em 1
 		v->pulos[0] = i + 1;
 		strcpy(v->jogada, r_aux->jogada);
@@ -284,7 +284,7 @@ void popula (grafo g, vertice r_aux, int h){
 					// gerar jogada
 					v = constroi_vertice();
 					v->jogada = malloc(sizeof(char)*g->k);
-					v->pulos = malloc(sizeof(char)*g->k);
+					v->pulos = malloc(sizeof(int)*g->k);
 					v->tipojogada = 'o';
 					strcpy(v->jogada, r_aux->jogada);
 					puloslocal[numpulos] = indice + 2;
@@ -314,7 +314,7 @@ void popula (grafo g, vertice r_aux, int h){
 			// gerar jogada de gol
 			v = constroi_vertice();
 			v->jogada = malloc(sizeof(char)*g->k);
-			v->pulos = malloc(sizeof(char)*g->k);
+			v->pulos = malloc(sizeof(int)*g->k);
 			v->tipojogada = 'o';
 			v->gol = 1;
 			puloslocal[numpulos] = g->k;
@@ -351,7 +351,7 @@ void popula (grafo g, vertice r_aux, int h){
 					v = constroi_vertice();
 					v->jogada = malloc(sizeof(char)*g->k);
 					strcpy(v->jogada, r_aux->jogada);
-					v->pulos = malloc(sizeof(char)*g->k);
+					v->pulos = malloc(sizeof(int)*g->k);
 					v->tipojogada = 'o';
 					puloslocal[numpulos] = indice;
 					numpulos++;
@@ -383,7 +383,7 @@ void popula (grafo g, vertice r_aux, int h){
 			// gerar jogada de gol
 			v = constroi_vertice();
 			v->jogada = malloc(sizeof(char)*g->k);
-			v->pulos = malloc(sizeof(char)*g->k);
+			v->pulos = malloc(sizeof(int)*g->k);
 			v->tipojogada = 'o';
 			puloslocal[numpulos] = 1;
 			numpulos++;
@@ -410,7 +410,7 @@ void popula (grafo g, vertice r_aux, int h){
 		v = constroi_vertice();
 		v->jogada = malloc(sizeof(char)*g->k);
 		strcpy(v->jogada, r_aux->jogada);
-		v->pulos = malloc(sizeof(char)*g->k);
+		v->pulos = malloc(sizeof(int)*g->k);
 		v->tamanhopulos = 1; // pulos tem que começar em 1
 		v->pulos[0] = i + 1;
 		v->tipojogada = 'f';
