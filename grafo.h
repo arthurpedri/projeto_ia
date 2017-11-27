@@ -65,7 +65,7 @@ int existe_chute(vertice v);
 int encontra_jogada(vertice v, int i);
 int analisa_jogada (char *jogada, int k, char l);
 void minmax(grafo g);
-int minmax_recursivo(vertice v);
+int minmax_recursivo(vertice v, char l);
 void popula_grafo (grafo g);
 void popula (grafo g, vertice r_aux, int h);
 

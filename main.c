@@ -19,6 +19,7 @@ int main(int argc, char **argv) {
     // destroi esses vértices
     destroi_grafo(g);
     // espera entrada
+    getchar();
     scanf("%c %d", &l, &k);
     g = gera_grafo(k, l);
   }

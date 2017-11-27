@@ -3,7 +3,8 @@
 #include <string.h>
 #include "grafo.h"
 
-#define ALT_MAX 5
+
+int ALT_MAX;
 
 struct vertice
 {
@@ -124,9 +125,12 @@ void popula_grafo (grafo g){
 			v->pulos = malloc(sizeof(int)*g->k);
 			v->tipojogada = 'o';
 			v->gol = 1;
-			v->valor = v->k*v->k*2;
+			v->k = g->k;
+			v->nivel = 2;
+			v->valor = ((v->k)*(v->k)*2) - (v->nivel);
+			
 			if (g->l == 'd') {
-				v->valor = v->valor*(-1);
+				v->valor = (v->valor)*(-1);
 			}
 			puloslocal[numpulos] = g->k+1;
 			numpulos++;
@@ -136,9 +140,8 @@ void popula_grafo (grafo g){
 			int limpador;
 			for (limpador = bolapos; limpador <= indice; limpador++)
 				v->jogada[limpador] = '.'; // limpar a posição
-			v->k = g->k;
-			v->nivel = 2;
 			insere_lista (v, r_aux->vizinhos);
+			//printf("vizinhos gol %d\n", tamanho_lista(r_aux->vizinhos));
 			insere_lista(v, g->vertices);
 		}
 
@@ -190,35 +193,37 @@ void popula_grafo (grafo g){
 			v->tipojogada = 'o';
 			puloslocal[numpulos] = 0;
 			numpulos++;
+			v->k = g->k;
 			v->tamanhopulos = numpulos; // pulos tem que começar em 1
 			copia_vetor_int(v->pulos, puloslocal, g->k);
 			v->gol = 1;
-			v->valor = v->k*v->k*2;
+			v->nivel = 2;
+			v->valor = ((v->k)*(v->k)*2) - (v->nivel);
 			if (g->l == 'e') {
-				v->valor = v->valor*(-1);
+				v->valor = (v->valor)*(-1);
 			}
 			strcpy(v->jogada, r_aux->jogada);
 			int limpador;
 			for (limpador = bolapos; limpador >= indice; limpador--)
 				v->jogada[limpador] = '.'; // limpar a posição
-			v->k = g->k;
-			v->nivel = 2;
 			insere_lista (v, r_aux->vizinhos);
 			insere_lista(v, g->vertices);
-			popula(g, v, ALT_MAX); //vertice, altura máxima
 		}
 
 
 	}
-
+	
 
 	int i = 0;
 	i = encontra_jogada(r_aux, i); // Procura a partir de i um '.' e devolve a posição dele
+	//printf("i %d\n", i);
 	while(i != -1){
+	//imprime_debug("entrei popula_grafo\n");
 		v = constroi_vertice();
 		v->jogada = malloc(sizeof(char)*g->k);
 		v->pulos = malloc(sizeof(int)*g->k);
 		v->tamanhopulos = 1; // pulos tem que começar em 1
+		//printf("i+1 %d", i+1);
 		v->pulos[0] = i + 1;
 		strcpy(v->jogada, r_aux->jogada);
 		v->tipojogada = 'f';
@@ -227,7 +232,7 @@ void popula_grafo (grafo g){
 		v->nivel = 2;
 		insere_lista (v, r_aux->vizinhos);
 		insere_lista(v, g->vertices);
-		printf("%s\n", v->jogada);
+		//printf("%s\n", v->jogada);
 		i++;
 		popula(g, v, ALT_MAX); //vertice, altura máxima
 		i = encontra_jogada(r_aux, i); // Procura a partir de i um '.' e devolve a posição dele
@@ -299,7 +304,7 @@ void popula (grafo g, vertice r_aux, int h){
 					v->nivel = r_aux->nivel + 1;
 					insere_lista (v, r_aux->vizinhos);
 					insere_lista(v, g->vertices);
-					printf("	%s\n", v->jogada);
+					//printf("	%s\n", v->jogada);
 					popula(g, v, ALT_MAX); //vertice, altura máxima
 				}
 				else{
@@ -314,10 +319,16 @@ void popula (grafo g, vertice r_aux, int h){
 			// gerar jogada de gol
 			v = constroi_vertice();
 			v->jogada = malloc(sizeof(char)*g->k);
+			v->k = g->k;
 			v->pulos = malloc(sizeof(int)*g->k);
 			v->tipojogada = 'o';
 			v->gol = 1;
 			puloslocal[numpulos] = g->k;
+			v->nivel = r_aux->nivel + 1;
+			v->valor = ((v->k)*(v->k)*2) - (v->nivel);
+			if (g->l == 'd') {
+				v->valor = (v->valor)*(-1);
+			}
 			numpulos++;
 			v->tamanhopulos = numpulos; // pulos tem que começar em 1
 			copia_vetor_int(v->pulos, puloslocal, g->k);
@@ -325,12 +336,9 @@ void popula (grafo g, vertice r_aux, int h){
 			int limpador;
 			for (limpador = bolapos; limpador <= indice; limpador++)
 				v->jogada[limpador] = '.'; // limpar a posição
-			v->k = g->k;
-			v->nivel = r_aux->nivel + 1;
 			insere_lista (v, r_aux->vizinhos);
 			insere_lista(v, g->vertices);
-			printf("	%s\n", v->jogada);
-			popula(g, v, ALT_MAX); //vertice, altura máxima
+			//printf("	%s\n", v->jogada);
 		}
 		free(puloslocal);
 		puloslocal = malloc(sizeof(int)*g->k);
@@ -355,9 +363,9 @@ void popula (grafo g, vertice r_aux, int h){
 					v->tipojogada = 'o';
 					puloslocal[numpulos] = indice;
 					numpulos++;
-					for (int w = 0; w < numpulos; w++) {
-						printf("%d\n", puloslocal[w]);
-					}
+					// for (int w = 0; w < numpulos; w++) {
+					// 	printf("%d\n", puloslocal[w]);
+					// }
 					v->tamanhopulos = numpulos; // pulos tem que começar em 1
 					copia_vetor_int(v->pulos, puloslocal, g->k);
 					int limpador;
@@ -367,7 +375,7 @@ void popula (grafo g, vertice r_aux, int h){
 					v->k = g->k;
 					v->nivel = r_aux->nivel + 1;
 					insere_lista (v, r_aux->vizinhos);
-					imprime_debug("Existe chute");
+					//imprime_debug("Existe chute");
 					insere_lista(v, g->vertices);
 					popula(g, v, ALT_MAX); //vertice, altura máxima
 				}
@@ -384,8 +392,14 @@ void popula (grafo g, vertice r_aux, int h){
 			v = constroi_vertice();
 			v->jogada = malloc(sizeof(char)*g->k);
 			v->pulos = malloc(sizeof(int)*g->k);
+			v->k = g->k;
 			v->tipojogada = 'o';
 			puloslocal[numpulos] = 1;
+			v->nivel = r_aux->nivel + 1;
+			v->valor = ((v->k)*(v->k)*2) - (v->nivel);
+			if (g->l == 'e') {
+				v->valor = (v->valor)*(-1);
+			}
 			numpulos++;
 			v->tamanhopulos = numpulos; // pulos tem que começar em 1
 			copia_vetor_int(v->pulos, puloslocal, g->k);
@@ -394,11 +408,8 @@ void popula (grafo g, vertice r_aux, int h){
 			int limpador;
 			for (limpador = bolapos; limpador >= indice; limpador--)
 				v->jogada[limpador] = '.'; // limpar a posição
-			v->k = g->k;
-			v->nivel = r_aux->nivel + 1;
 			insere_lista (v, r_aux->vizinhos);
 			insere_lista(v, g->vertices);
-			popula(g, v, ALT_MAX); //vertice, altura máxima
 		}
 
 	}
@@ -419,7 +430,7 @@ void popula (grafo g, vertice r_aux, int h){
 		v->nivel = r_aux->nivel + 1;
 		insere_lista (v, r_aux->vizinhos);
 		insere_lista(v, g->vertices);
-		printf("	%s\n", v->jogada);
+		//printf("	%s\n", v->jogada);
 		i++;
 		popula(g, v, ALT_MAX); //vertice, altura máxima
 		i = encontra_jogada(r_aux, i); // Procura a partir de i um '.' e devolve a posição dele
@@ -428,7 +439,6 @@ void popula (grafo g, vertice r_aux, int h){
 }
 
 void minmax(grafo g){
-	imprime_debug("minmax");
 	vertice v = g->raiz;
 	vertice aux;
 	int *pulos;
@@ -436,10 +446,25 @@ void minmax(grafo g){
 	char tipojogada;
 	int tamanhopulos;
 	int maior;
-
-	no n_lista = primeiro_no(v->vizinhos);
+	
+	
+	no n_lista;
+	// for (n_lista = primeiro_no(v->vizinhos); n_lista; n_lista=proximo_no(n_lista)) {
+	// 	aux = conteudo(n_lista);
+	// 	if (!aux)
+	// 		imprime_debug("null");
+	// 	printf("jogada %s\n", aux->jogada);
+	// 	printf("valor %d tipo %c\n", aux->valor, aux->tipojogada);
+	// 	for (int i = 0; i < aux->tamanhopulos; i++) {
+	// 		printf("%d ", aux->pulos[i]);
+	// 	}
+	// 	imprime_debug(" ");
+	// }
+	n_lista = primeiro_no(v->vizinhos);
+	//printf("tam vizinhos v %d\n", tamanho_lista(v->vizinhos));
 	aux = conteudo(n_lista);
-	maior = minmax_recursivo(aux);
+	//imprime_debug("minmax");
+	maior = minmax_recursivo(aux, g->l);
 
 	copia_vetor_int(pulos, aux->pulos, aux->tamanhopulos);
 	tamanhopulos = aux->tamanhopulos;
@@ -447,15 +472,31 @@ void minmax(grafo g){
 
 	for (n_lista = proximo_no(n_lista); n_lista; n_lista=proximo_no(n_lista)) {
 	 	aux = conteudo(n_lista);
-		int aux2 = minmax_recursivo(aux);
-		if (aux2 > maior) {
-			maior = aux2;
-			copia_vetor_int(pulos, aux->pulos, aux->tamanhopulos);
-			tamanhopulos = aux->tamanhopulos;
-			tipojogada = aux->tipojogada;
+		int aux2 = minmax_recursivo(aux, g->l);
+		if (g->l == 'd'){
+			if (aux2 > maior) {
+				maior = aux2;
+				copia_vetor_int(pulos, aux->pulos, aux->tamanhopulos);
+				tamanhopulos = aux->tamanhopulos;
+				tipojogada = aux->tipojogada;
+			}	
+		} 
+		else {
+			if (aux2 >= maior) {
+				//printf("aux2 %d\n", aux2);
+				maior = aux2;
+				copia_vetor_int(pulos, aux->pulos, aux->tamanhopulos);
+				// for (int i = 0; i < aux->tamanhopulos; i++) {
+				// 	printf(" %d", aux->pulos[i]);
+				// }
+				//imprime_debug(" ");
+				tamanhopulos = aux->tamanhopulos;
+				tipojogada = aux->tipojogada;
+			}
 		}
+		
 	}
-
+	//printf("maior %d\n", maior);
 
 		printf("%c %c", g->l, tipojogada);
 		for (int i = 0; i < tamanhopulos; i++) {
@@ -466,8 +507,11 @@ void minmax(grafo g){
 
 }
 
-int minmax_recursivo(vertice v){
+int minmax_recursivo(vertice v, char l){
 	if (v->nivel == ALT_MAX) {
+		return v->valor;
+	}
+	else if (v->gol){
 		return v->valor;
 	}
 
@@ -478,25 +522,36 @@ int minmax_recursivo(vertice v){
 	no n_lista = primeiro_no(v->vizinhos);
 	aux = conteudo(n_lista);
 	if (aux->nivel % 2 ==0) {//par é min
-		menor = minmax_recursivo(aux);
+		menor = minmax_recursivo(aux, l);
 
 		for (n_lista = proximo_no(n_lista); n_lista; n_lista=proximo_no(n_lista)) {
 		 	aux = conteudo(n_lista);
-			int aux2 = minmax_recursivo(aux);
-			if (aux2 < menor) {
-				menor = aux2;
+			int aux2 = minmax_recursivo(aux, l);
+			if (l == 'd'){
+				if (aux2 < menor) 
+					menor = aux2;
+			}
+			else {
+				if (aux2 <= menor) 
+					menor = aux2;
 			}
 		}
 		return menor;
 	}
 	else{
-		maior = minmax_recursivo(aux);
+		maior = minmax_recursivo(aux, l);
 		for (n_lista = proximo_no(n_lista); n_lista; n_lista=proximo_no(n_lista)) {
 		 	aux = conteudo(n_lista);
-			int aux2 = minmax_recursivo(aux);
-			if (aux2 > maior) {
-				maior = aux2;
+			int aux2 = minmax_recursivo(aux, l);
+			if (l == 'd'){
+				if (aux2 > maior) 
+					maior = aux2;
 			}
+			else {
+				if (aux2 >= maior) 
+					maior = aux2;
+			}
+			
 		}
 		return maior;
 	}
@@ -612,13 +667,14 @@ int analisa_jogada (char *jogada, int k, char l){
 		soma += jogadapesos[i];
 
 	free(jogadapesos);
-
+	//printf("%s\n %d\n", jogada, soma);
 	return soma;
 
 }
 
 int encontra_jogada(vertice v, int i){
 	for (int j = i; j < v->k; j++) {
+		//printf("jogada %c\n", v->jogada[j]);
 		if (v->jogada[j] == '.') {
 			return j;
 		}
@@ -723,11 +779,13 @@ grafo gera_grafo (int k, char l){
 	if (!g)
 		return NULL;
 	g->k = k;
+	ALT_MAX = 4;
 	g->l = l;
 	g->vertices = constroi_lista();
 	vertice v = constroi_vertice();
 	v->jogada = malloc(sizeof(char)*k);
 	scanf("%s", v->jogada);
+	//printf("%s", v->jogada);
 	v->k = k;
 	v->nivel = 1;
 	g->raiz = v;
