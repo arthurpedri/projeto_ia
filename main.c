@@ -17,6 +17,7 @@ int main(int argc, char **argv) {
   int pos_filo;
   int pos_bola[16];
   int num_saltos;
+  int flag;
   // conecta com o controlador do campo
   campo_conecta(argc, argv);
 
@@ -68,6 +69,16 @@ if(mov_adv != 'n') {
     }
   }
     printf("campo: %s\n", campo);
+    flag = 0
+    for (int i = 0; i < k; i++) {
+      if(campo[i]= 'o'){
+        flag = 1;
+        break;
+      }
+    }
+    if (!flag) {
+      break;
+    }
     g = gera_grafo(k, l, campo);
   }
 
