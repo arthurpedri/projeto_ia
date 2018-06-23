@@ -60,7 +60,7 @@ int h (lista componentes);
 
 lista h_simples (lista componentes, grafo g);
 
-grafo gera_grafo (int k, char l);
+grafo gera_grafo (int k, char l, char *campo);
 int existe_chute(vertice v);
 int encontra_jogada(vertice v, int i);
 int analisa_jogada (char *jogada, int k, char l);
