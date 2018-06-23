@@ -69,9 +69,9 @@ if(mov_adv != 'n') {
     }
   }
     printf("campo: %s\n", campo);
-    flag = 0
+    flag = 0;
     for (int i = 0; i < k; i++) {
-      if(campo[i]= 'o'){
+      if(campo[i]== 'o'){
         flag = 1;
         break;
       }
