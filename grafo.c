@@ -631,10 +631,10 @@ int analisa_jogada (char *jogada, int k, char l){
 					}
 				}
 				if (l == 'd'){
-					jogadapesos[i] = contpeso;
+					jogadapesos[i] = (-1)*(contpeso);
 				}
 				else {
-					jogadapesos[i] = (-1)*(contpeso);
+					jogadapesos[i] = contpeso;
 				}
 			}
 			else if (i > meio){ // bola no lado direito (ignorando bola no meio)
