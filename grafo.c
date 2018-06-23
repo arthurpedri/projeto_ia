@@ -508,14 +508,17 @@ void minmax(grafo g){
 	}
 	//printf("maior %d\n", maior);
 		char buf [512];
+		int offset =  3;
 		sprintf(buf, "%c %c", g->l, tipojogada);
 		// printf("%c %c", g->l, tipojogada);
-		for (int i = 0; i < tamanhopulos; i++) {
-		// 	printf(" %d", pulos[i]);
-				sprintf(buf, " %d", pulos[i]);
+		for (int i = 0; i < tamanhopulos; i++, offset+=2) {
+		 //	printf(" %d", pulos[i]);
+				sprintf(&(buf[offset]), " %d", pulos[i]);
 		}
 		// printf("\n");
-		sprintf(buf, "\n");
+		sprintf(&(buf[offset]), "\n");
+		printf("%s", buf);
+		campo_envia(buf);
 		free (pulos);
 
 }

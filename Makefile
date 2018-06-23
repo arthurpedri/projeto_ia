@@ -1,7 +1,7 @@
 CFLAGS  = -g -std=c99 -O3
 LDLIBS = -l hiredis -l readline
 
-all: lista grafo princ outro
+all: campo lista grafo princ outro
 
 campo:
 	gcc $(CFLAGS) -c campo.c -o campo.o $(LDLIBS)
@@ -16,7 +16,7 @@ princ:
 	gcc $(CFLAGS) -c main.c -o main.o $(LDLIBS)
 
 outro:
-	gcc  main.o grafo.o lista.o campo.o -o main
+	gcc  main.o grafo.o lista.o campo.o -o main $(LDLIBS)
 
 
 clean :

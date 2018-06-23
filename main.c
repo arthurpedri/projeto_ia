@@ -14,20 +14,31 @@ int main(int argc, char **argv) {
   char mov_adv;
   int k; // Tamanho do jogo;
   char l;
+  int pos_filo;
+  int pos_bola[16];
+  int num_saltos;
   // conecta com o controlador do campo
   campo_conecta(argc, argv);
 
   // recebe o campo inicial e o movimento do adversario
   campo_recebe(buf);
-
+  printf("%s", buf);
   sscanf(strtok(buf, " \n"), "%c", &l);
   sscanf(strtok(NULL, " \n"), "%d", &k);
   sscanf(strtok(NULL, " \n"), "%s", campo);
   sscanf(strtok(NULL, " \n"), "%c", &lado_adv);
   sscanf(strtok(NULL, " \n"), "%c", &mov_adv);
-
+if(mov_adv != 'n') {
+    if(mov_adv == 'f')
+      sscanf(strtok(NULL, " \n"), "%d", &pos_filo);
+    else {
+      sscanf(strtok(NULL, " \n"), "%d", &num_saltos);
+      for(int i = 0; i < num_saltos; i++)
+    sscanf(strtok(NULL, " \n"), "%d", &(pos_bola[i]));
+    }
+  }
   // scanf("%c %d", &l, &k);
-  grafo g = gera_grafo(k, l, &campo);
+  grafo g = gera_grafo(k, l, campo);
   while (1) {
     popula_grafo(g);
     // Avalia as jogadas com min max (retorna a melhor jogada)
@@ -36,15 +47,28 @@ int main(int argc, char **argv) {
     // destroi esses vértices
     destroi_grafo(g);
     // espera entrada
+    printf("antes de receber:\n");
+    printf("%s", buf);
     campo_recebe(buf);
     // scanf("%c %d", &l, &k);
+    printf("depois:\n");
+    printf("%s", buf);
     sscanf(strtok(buf, " \n"), "%c", &l);
     sscanf(strtok(NULL, " \n"), "%d", &k);
     sscanf(strtok(NULL, " \n"), "%s", campo);
     sscanf(strtok(NULL, " \n"), "%c", &lado_adv);
     sscanf(strtok(NULL, " \n"), "%c", &mov_adv);
-    
-    g = gera_grafo(k, l, &campo);
+    if(mov_adv != 'n') {
+    if(mov_adv == 'f')
+      sscanf(strtok(NULL, " \n"), "%d", &pos_filo);
+    else {
+      sscanf(strtok(NULL, " \n"), "%d", &num_saltos);
+      for(int i = 0; i < num_saltos; i++)
+    sscanf(strtok(NULL, " \n"), "%d", &(pos_bola[i]));
+    }
+  }
+    printf("campo: %s", campo);
+    g = gera_grafo(k, l, campo);
   }
 
 
