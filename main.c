@@ -29,7 +29,7 @@ int main(int argc, char **argv) {
   sscanf(strtok(NULL, " \n"), "%s", campo);
   sscanf(strtok(NULL, " \n"), "%c", &lado_adv);
   sscanf(strtok(NULL, " \n"), "%c", &mov_adv);
-if(mov_adv != 'n') {
+  if(mov_adv != 'n') {
     if(mov_adv == 'f')
       sscanf(strtok(NULL, " \n"), "%d", &pos_filo);
     else {
@@ -38,7 +38,6 @@ if(mov_adv != 'n') {
     sscanf(strtok(NULL, " \n"), "%d", &(pos_bola[i]));
     }
   }
-  // scanf("%c %d", &l, &k);
   grafo g = gera_grafo(k, l, campo);
   while (1) {
     popula_grafo(g);
@@ -48,12 +47,7 @@ if(mov_adv != 'n') {
     // destroi esses vértices
     destroi_grafo(g);
     // espera entrada
-    printf("antes de receber:\n");
-    printf("%s", buf);
     campo_recebe(buf);
-    // scanf("%c %d", &l, &k);
-    printf("depois:\n");
-    printf("%s", buf);
     sscanf(strtok(buf, " \n"), "%c", &l);
     sscanf(strtok(NULL, " \n"), "%d", &k);
     sscanf(strtok(NULL, " \n"), "%s", campo);
@@ -68,9 +62,8 @@ if(mov_adv != 'n') {
     sscanf(strtok(NULL, " \n"), "%d", &(pos_bola[i]));
     }
   }
-    printf("campo: %s\n", campo);
     flag = 0;
-    for (int i = 0; i < k; i++) {
+    for (int i = 0; i < k; i++) { // Se nao tem mais bola ouve jogada de Gol
       if(campo[i]== 'o'){
         flag = 1;
         break;

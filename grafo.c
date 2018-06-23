@@ -510,16 +510,16 @@ void minmax(grafo g){
 		char buf [512];
 		int offset =  3;
 		sprintf(buf, "%c %c", g->l, tipojogada);
-		 printf("%c %c", g->l, tipojogada);
+		// printf("%c %c", g->l, tipojogada);
 		for (int i = 0; i < tamanhopulos; i++, offset+=2) {
-			printf(" %d", pulos[i]);
+			// printf(" %d", pulos[i]);
 				sprintf(&(buf[offset]), " %d", pulos[i]);
 			if(pulos[i] > 9)
 				offset+=1;
 			if(pulos[i] > 99)
 				offset+=1;
 		}
-		 printf("\n");
+		 // printf("\n");
 		sprintf(&(buf[offset]), "\n");
 		printf("%s", buf);
 		campo_envia(buf);
@@ -812,7 +812,7 @@ grafo gera_grafo (int k, char l, char *campo){
 	// scanf("%s", v->jogada);
 	// getchar();
 	// fgets(a, 100, stdin);
-	printf("%s", v->jogada);
+	// printf("%s", v->jogada);
 	v->k = k;
 	v->nivel = 1;
 	g->raiz = v;
