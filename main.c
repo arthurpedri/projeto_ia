@@ -67,7 +67,7 @@ if(mov_adv != 'n') {
     sscanf(strtok(NULL, " \n"), "%d", &(pos_bola[i]));
     }
   }
-    printf("campo: %s", campo);
+    printf("campo: %s\n", campo);
     g = gera_grafo(k, l, campo);
   }
 

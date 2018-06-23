@@ -803,11 +803,12 @@ grafo gera_grafo (int k, char l, char *campo){
 	vertice v = constroi_vertice();
 	v->jogada = malloc(sizeof(char)*k);
 	strcpy(v->jogada, campo);
+
 	// char a[100];
 	// scanf("%s", v->jogada);
 	// getchar();
 	// fgets(a, 100, stdin);
-	//printf("%s", v->jogada);
+	printf("%s", v->jogada);
 	v->k = k;
 	v->nivel = 1;
 	g->raiz = v;
